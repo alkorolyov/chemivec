@@ -12,7 +12,6 @@ def try_import_module(name: str):
         return False
 
 
-try_import_module("mymath")
 if try_import_module("chemivec"):
     from chemivec import _rxn_match
     import numpy as np
