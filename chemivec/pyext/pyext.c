@@ -1,0 +1,253 @@
+//
+// Created by Alex on 09/03/2023.
+//
+
+#define PY_SSIZE_T_CLEAN
+#include "Python.h"
+
+#define PY_ARRAY_UNIQUE_SYMBOL CHEMIVEC_ARRAY_API
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#include "numpy/arrayobject.h"
+
+#include "vec.h"
+
+
+/*
+
+
+PyArrayObject* createNumpyArrFromString(int size, const char** strings) {
+    npy_intp dims[] = {size};
+
+    // create empty 1D numpy array of python objects
+    PyArrayObject* arr = (PyArrayObject*)PyArray_EMPTY(1, dims, NPY_OBJECT, NPY_ARRAY_C_CONTIGUOUS);
+
+    // copy strings to numpy array
+    for (npy_intp i = 0; i < size; i++) {
+        PyArray_SETITEM(arr, PyArray_GETPTR1(arr, i), PyUnicode_FromString(strings[i]));
+    }
+    return arr;
+}
+
+qword initIndigo() {
+    printf("Starting indigo session ... ");
+
+    // start session
+    qword id = indigoAllocSessionId();
+
+    if (id == -1) {
+        printf("FAILED\n");
+        exit(1);
+    }
+
+    printf("OK \nversion:   %s\n", indigoVersion());
+    return id;
+}
+
+
+int main() {
+
+    // Initialize Python interpreter
+    Py_Initialize();
+
+    // Initialize NumPy
+    initNumpy();
+
+    PyObject* pyobj = PyUnicode_FromString("Hello World!");
+
+    char* buf = calloc(SMILE_BUF_LEN, sizeof(char));
+    int len = unicodeAsUTF8(pyobj, buf);
+    if (len > 0) {
+        printf("length:%i string: %.5s", len, buf);
+    }
+    free(buf);
+
+
+
+    // Initialize Indigo
+    qword sessionId = initIndigo();
+
+
+    // Define C array of string in_data
+//    const char* strings[] = {"[C:1](=O)C>>[C:1](O)C",
+//                             "C(=C)C>>C(O)C",
+//                             "[C:2]=O>>[C:2]O",
+//                             "C=O>>CO"};
+    const char* strings[] = {"[C:1](=O)C>>[C:1](O)C",
+                             "C=O>>CO",
+                             "[C:2]=O>>[C:2]O",
+                             "[C:1](=O)C>>C(O)[C:1]",
+                             "[C:2]=O>>[C:2]O",
+                             "[C:1](=O)C>>C(O)[C:1]",
+                             };
+
+    // Determine number of elements in the string array
+    int size = sizeof(strings) / sizeof(char*);
+    npy_intp dims[] = {size};
+
+    // Create input and output numpy arrays
+    PyArrayObject* np_input = createNumpyArrFromString(size, strings);
+    PyArrayObject* np_output = (PyArrayObject*)PyArray_EMPTY(1, dims, NPY_BOOL, NPY_ARRAY_C_CONTIGUOUS);
+
+    size = PyArray_SIZE(np_input);
+
+    PyObject* repr = PyObject_Repr((PyObject*)np_input);
+    printf("Input array:\n%s\n", PyUnicode_AsUTF8(repr));
+
+    // Access the in_data pointer and shape of the array
+    PyObject** in_data = (PyObject**) PyArray_DATA(np_input);
+    npy_bool* out_data = (npy_bool*) PyArray_DATA(np_output);
+
+    // Create Indigo query object
+    const char* querySmarts = "[C:1]=[O]>>[C:1]-[OX2]";
+    int query = indigoLoadReactionSmartsFromString(querySmarts);
+    indigoOptimize(query, NULL);
+    printf("Query: %s\n", querySmarts);
+
+
+//    int num_threads = omp_get_max_threads();
+    int num_threads = 2;
+
+//    Py_BEGIN_ALLOW_THREADS;
+
+    // Divide input in_data into batches
+    int batch_size = size / num_threads;
+
+//    #pragma omp parallel num_threads(num_threads)
+//    {
+//        int thread_num = omp_get_thread_num();
+//        int start_idx = thread_num * batch_size;
+//        int end_idx = start_idx + batch_size;
+//        // last batch
+//        if (thread_num == num_threads - 1) {
+//            end_idx = size;
+//        }
+//        int current_size = end_idx - start_idx;
+//        reactionSubstructureSearchBatch_py(in_data + start_idx,
+//                                        out_data + start_idx,
+//                                        current_size,
+//                                        query,
+//                                        strbuf,
+//                                        "DAYLIGHT-AAM");
+//    }
+
+//    Py_END_ALLOW_THREADS;
+
+    // Iterate over the in_data pointer to access the Python strings
+//    reactionSubstructureSearchBatch_py(in_data, out_data, PyArray_SIZE(np_input), query, NULL);
+
+    // Convert Python strings to C strings
+    char ** smiles_array = numpyAsUTF8(np_input);
+    reactionMatchBatch_py(smiles_array, out_data, size, query, "DAYLIGHT-AAM");
+    free(smiles_array);
+
+    PyArrayObject* np_output_vec = reactionMatchVec(np_input, "[C:1]=[O]>>[C:1]-[OX2]", "DAYLIGHT-AAM");
+//    PyArrayObject* np_output_vec = NULL;
+
+
+    // Print output array
+
+    if (np_output != NULL) {
+        repr = PyObject_Repr((PyObject*)np_output);
+        printf("Output array:\n%s\n", PyUnicode_AsUTF8(repr));
+        Py_DECREF(np_output);
+    }
+
+    if (np_output_vec != NULL) {
+        repr = PyObject_Repr((PyObject*)np_output_vec);
+        printf("Output array vec:\n%s\n", PyUnicode_AsUTF8(repr));
+        Py_DECREF(np_output_vec);
+    }
+
+
+    // Decrement the reference count of the NumPy array object
+    Py_DECREF(np_input);
+
+
+    // Shut down Python interpreter
+    Py_Finalize();
+
+    // End Indigo session and free memory
+    indigoFreeAllObjects();
+    indigoReleaseSessionId(sessionId);
+
+    const char* rxnSmarts = "[F:1][C:2]([F:31])([F:30])[C:3]1[CH:4]=[C:5]([C@H:13]2[O:17][C:16](=[O:18])[N:15]([CH2:19][C:20]3[C:25](Br)=[CH:24][N:23]=[C:22]([S:27][CH3:28])[N:21]=3)[C@H:14]2[CH3:29])[CH:6]=[C:7]([C:9]([F:12])([F:11])[F:10])[CH:8]=1.[CH:32]([C:35]1[CH:36]=[C:37](B(O)O)[C:38]([O:41][CH3:42])=[N:39][CH:40]=1)([CH3:34])[CH3:33].C([O-])([O-])=O.[K+].[K+].[NH4+].[Cl-]>C(OCC)(=O)C.[Pd](Cl)Cl.C(P(C(C)(C)C)[C-]1C=CC=C1)(C)(C)C.[C-]1(P(C(C)(C)C)C(C)(C)C)C=CC=C1.[Fe+2]>[F:1][C:2]([F:31])([F:30])[C:3]1[CH:4]=[C:5]([C@H:13]2[O:17][C:16](=[O:18])[N:15]([CH2:19][C:20]3[C:25]([C:37]4[C:38]([O:41][CH3:42])=[N:39][CH:40]=[C:35]([CH:32]([CH3:34])[CH3:33])[CH:36]=4)=[CH:24][N:23]=[C:22]([S:27][CH3:28])[N:21]=3)[C@H:14]2[CH3:29])[CH:6]=[C:7]([C:9]([F:12])([F:11])[F:10])[CH:8]=1";
+    const char* querySmarts = "[B;X3,4]-[C,c:1].[C,c:2]-[Cl,Br,I,$([O]-S)]>>[C,c:1]-[C,c:2]";
+
+    int rxn = indigoLoadReactionSmartsFromString(rxnSmarts);
+    int query = indigoLoadReactionSmartsFromString(querySmarts);
+    int matcher = indigoSubstructureMatcher(rxn, NULL);
+    int match = indigoMatch(matcher, query);
+
+    if (reactionSubstructureMatch((char*)rxnSmarts, query))
+        printf("%s - SMARTS query matched!\n", querySmarts);
+    else
+        printf("No matches found\n");
+
+
+
+    return 0;
+}
+
+
+*/
+
+
+// Method definition
+PyObject* rxn_match(PyObject* self, PyObject* args, PyObject* kwargs) {
+    static char* keywords[] = {"np_input", "query_smarts", "aam_mode", NULL};
+
+    PyArrayObject* np_input;
+    char* querySmarts;
+    char* aam_mode;
+
+    // Parse the arguments using PyArg_ParseTuple
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "Oss", keywords, &np_input, &querySmarts, &aam_mode)) {
+        return NULL;
+    }
+
+    // Return the NumPy array as a Python object
+    return (PyObject*)reactionMatchVec(np_input, querySmarts, aam_mode);
+}
+
+
+// Define the module methods
+static PyMethodDef methods[] = {
+        {"_rxn_match", (PyCFunction) rxn_match, METH_VARARGS | METH_KEYWORDS, "Low level vecorized reaction match"},
+        {NULL, NULL, 0, NULL}   // Sentinel value to indicate end of list
+};
+
+
+// Define the module structure
+static PyModuleDef module_def = {
+        PyModuleDef_HEAD_INIT,
+        "chemivec",
+        "Vectorized cheminformatics module, based on Indigo C-API",
+        -1,
+        methods,
+        NULL, // Optional slot definitions
+        NULL, // Optional traversal function
+        NULL, // Optional clear function
+        NULL  // Optional module deallocation function
+};
+
+
+// Create the module
+PyMODINIT_FUNC PyInit_chemivec(void) {
+    import_array();
+
+//    printf("Starting indigo session ... ");
+//    qword id = indigoAllocSessionId();
+//    if (id == -1) {
+//        printf("FAILED\n");
+//        exit(1);
+//    }
+//    printf("OK \nversion:   %s\n", indigoVersion());
+
+    PyObject* module = PyModule_Create(&module_def);
+//    PyModule_AddObject(module, "INDIGO_ID", PyLong_FromLong(id));
+//
+//    indigoFreeAllObjects();
+//    indigoReleaseSessionId(id);
+
+    return module;
+}
