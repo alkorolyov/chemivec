@@ -17,3 +17,9 @@ Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
 # to check dependencies of your *.pyd library
 # dumpbin should be run from developer command prompt of VS 2022
 dumpbin <library name>.pyd /DEPENDENTS
+
+
+# Trying to integrate with cibuildwheels
+# (optional) activate conda env
+mamba activate dev
+pip install cibuildwheel

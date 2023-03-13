@@ -18,7 +18,6 @@ PyArrayObject *str2numpy(char **strings, int size) {
     return arr;
 }
 
-
 /***
  * Creates array of C strings from Numpy array of python strings
  * @param np_array numpy array of python unicode strings
@@ -33,7 +32,6 @@ char** numpy2str(PyArrayObject* np_array) {
     }
     return cstr;
 }
-
 
 /***
  * Reaction substructure search for single batch.
@@ -58,6 +56,7 @@ void reactionMatchBatch(struct ReactionBatch* batch, int query, const char *mode
         finishSearch(rxn, matcher, match);
     }
 }
+
 /**
  * Vectorized version of reaction match. Creates new
  * boolean NumPy array of the same shape as an output.
