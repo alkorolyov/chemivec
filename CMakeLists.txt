@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(Chemivec LANGUAGES NONE)
+project(src/chemivec LANGUAGES NONE)
 
 
 # Override Indigo options to install indigo-core only
@@ -13,4 +13,4 @@ set(WITH_STATIC ON CACHE STRING "Build Indigo static library as well as shared" 
 # Tests
 set(ENABLE_TESTS OFF CACHE STRING "Enable CTest tests" FORCE)
 
-add_subdirectory(chemivec-src)
+add_subdirectory(src)

@@ -220,7 +220,8 @@ static PyMethodDef methods[] = {
 // Define the module structure
 static PyModuleDef module_def = {
         PyModuleDef_HEAD_INIT,
-        "chemivec",
+        "Internal \"_chemivec\" module", // TODO Also don't forget to change name here
+//        "_chemivec", // TODO Also don't forget to change name here
         "Vectorized cheminformatics module, based on Indigo C-API",
         -1,
         methods,
@@ -232,22 +233,10 @@ static PyModuleDef module_def = {
 
 
 // Create the module
-PyMODINIT_FUNC PyInit_chemivec(void) {
+// TODO Define module name here by PyInit_<your_modul_ename>
+PyMODINIT_FUNC PyInit__chemivec(void) {
     import_array();
 
-//    printf("Starting indigo session ... ");
-//    qword id = indigoAllocSessionId();
-//    if (id == -1) {
-//        printf("FAILED\n");
-//        exit(1);
-//    }
-//    printf("OK \nversion:   %s\n", indigoVersion());
-
     PyObject* module = PyModule_Create(&module_def);
-//    PyModule_AddObject(module, "INDIGO_ID", PyLong_FromLong(id));
-//
-//    indigoFreeAllObjects();
-//    indigoReleaseSessionId(id);
-
     return module;
 }

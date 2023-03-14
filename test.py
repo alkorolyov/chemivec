@@ -14,11 +14,14 @@ def try_import_module(name: str):
 
 
 def test_import():
+    try_import_module("_chemivec")
+
+def test_import_package():
     try_import_module("chemivec")
 
 
 def test_basic():
-    from chemivec import _rxn_match
+    from _chemivec import _rxn_match
     arr = np.array(["[C:1](=O)C>>[C:1](O)C",
                     "C=O>>CO",
                     "[C:2]=O>>[C:2]O",
@@ -41,8 +44,8 @@ def test_basic():
 
 
 def test_timeit():
-    from chemivec import _rxn_match
-    arr = np.load("test_10000.npy", allow_pickle=True)
+    from _chemivec import _rxn_match
+    arr = np.load("tests/test_10000.npy", allow_pickle=True)
     query = "[B;X3,4]-[C,c:1].[C,c:2]-[Cl,Br,I,$([O]-S)]>>[C,c:1]-[C,c:2]"
 
     start = time()
@@ -55,5 +58,6 @@ def test_timeit():
 
 
 test_import()
+test_import_package()
 test_basic()
 test_timeit()
