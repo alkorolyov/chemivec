@@ -217,11 +217,11 @@ static PyMethodDef methods[] = {
 };
 
 
+
 // Define the module structure
 static PyModuleDef module_def = {
         PyModuleDef_HEAD_INIT,
-        "Internal \"_chemivec\" module", // TODO Also don't forget to change name here
-//        "_chemivec", // TODO Also don't forget to change name here
+        "Internal \"_chemivec\" module", // Also don't forget to change name here
         "Vectorized cheminformatics module, based on Indigo C-API",
         -1,
         methods,
@@ -232,8 +232,7 @@ static PyModuleDef module_def = {
 };
 
 
-// Create the module
-// TODO Define module name here by PyInit_<your_modul_ename>
+// Define module name here by PyInit_<your_modul_ename>
 PyMODINIT_FUNC PyInit__chemivec(void) {
     import_array();
 
