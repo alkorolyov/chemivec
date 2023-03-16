@@ -13,8 +13,8 @@
 void test_numpy_c_string() {
     char* in_strings[] = {"string1", "", "string2", "string3"};
     int size = 4;
-    PyArrayObject* np_strings = str2numpy(in_strings, size);
-    char** out_strings = numpy2str(np_strings);
+    PyArrayObject* np_strings = cstr2numpy(in_strings, size);
+    char** out_strings = numpy2cstr(np_strings);
 
     for (int i = 0; i < size; i++) {
 //        printf("%s %s\n", in_strings[i], out_strings[i]);
@@ -42,11 +42,11 @@ void test_reaction_batch(qword id) {
     batch.sid = id;
     batch.threadNum = 0;
 
-    npy_bool result[] = {1, 0, 1, 0};
+    npy_bool correct_result[] = {1, 0, 1, 0};
     reactionMatchBatch(&batch, query, "DAYLIGHT-AAM");
     for (int i = 0; i < size; i++) {
 //        printf("%s - [%i]\n", batch.pin[i], batch.pout[i]);
-        assert(batch.pout[i] == result[i]);
+        assert(batch.pout[i] == correct_result[i]);
     }
 
 }
@@ -59,10 +59,13 @@ void test_reaction_vec() {
     int size = 4;
     npy_intp dims[] = {size};
     char* querySmarts = "[C:1]=[O]>>[C:1]-[OX2]";
-    PyArrayObject* result = reactionMatchVec(str2numpy(rxn_smi, size), querySmarts, "DAYLIGHT-AAM");
-
-    PyObject* repr = PyObject_Repr((PyObject*)result);
-    printf("Output array vec:\n%s\n", PyUnicode_AsUTF8(repr));
+    PyArrayObject* np_result = reactionMatchVec(rxn_smi, size, querySmarts, "DAYLIGHT-AAM");
+    npy_bool* result = PyArray_DATA(np_result);
+    npy_bool correct_result[] = {1, 0, 1, 0};
+    for (int i = 0; i < size; i++) {
+//        printf("%s - [%i]\n", batch.pin[i], batch.pout[i]);
+        assert(batch.pout[i] == correct_result[i]);
+    }
 }
 
 int main() {
@@ -70,6 +73,10 @@ int main() {
     import_array()
 
     qword id = indigoAllocSessionId();
+    if (id == -1) {
+        printf("indigoAllocSessionId failed");
+        exit(EXIT_FAILURE);
+    }
 
     test_numpy_c_string();
     test_reaction_batch(id);
@@ -80,5 +87,5 @@ int main() {
     }
     indigoReleaseSessionId(id);
     Py_Finalize();
-    return 0;
+    return EXIT_SUCCESS;
 }

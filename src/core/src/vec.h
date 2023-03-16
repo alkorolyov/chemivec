@@ -21,13 +21,16 @@ struct ReactionBatch{
     int threadNum;
 };
 
-PyArrayObject* str2numpy(char** strings, int size);
+PyArrayObject* cstr2numpy(char** strings, int size);
 
-char** numpy2str(PyArrayObject * np_array);
+char** numpy2cstr(PyArrayObject * np_array);
 
 void reactionMatchBatch(struct ReactionBatch* batch, int query, const char *mode);
 
-PyArrayObject* reactionMatchVec(PyArrayObject* np_input, char* querySmarts, const char* mode);
+PyArrayObject *reactionMatchVec(char **in_data, int size, char *querySmarts, const char *mode);
+
+PyArrayObject *reactionMatchPyStr(PyArrayObject * np_input, char* querySmarts, char* aam_mode);
+
 
 inline static void finishSearch(int rxn, int matcher, int match) {
     indigoFree(rxn);

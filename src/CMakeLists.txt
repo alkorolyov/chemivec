@@ -1,11 +1,6 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.15)
 
-project(chemivec-srt LANGUAGES C CXX)
-
-if(POLICY CMP0054)
-    # https://cmake.org/cmake/help/v3.9/policy/CMP0054.html
-    cmake_policy(SET CMP0054 NEW)
-endif()
+project(chemivec-src LANGUAGES C CXX)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
@@ -43,6 +38,8 @@ message(STATUS CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS})
 add_subdirectory(core)
 add_subdirectory(pyext)
 
-if(ENABLE_TESTS)
+if(TESTING)
+    include(CTest)
+    enable_testing()
     add_subdirectory(tests)
 endif()

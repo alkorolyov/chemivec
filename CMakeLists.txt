@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.15)
 
-project(src/chemivec LANGUAGES NONE)
+project(Chemivec LANGUAGES NONE)
 
 
 # Override Indigo options to install indigo-core only
@@ -9,8 +9,9 @@ set(BUILD_INDIGO_UTILS OFF CACHE STRING "Build indigo-cano, indigo-deco and indi
 set(BUILD_BINGO OFF CACHE STRING "Build all existing Bingo cartridges" FORCE)
 set(BUILD_BINGO_ELASTIC OFF CACHE STRING "Build Bingo Elastic cartridges for Java and Python" FORCE)
 set(WITH_STATIC ON CACHE STRING "Build Indigo static library as well as shared" FORCE)
+set(ENABLE_TESTS OFF CACHE STRING "Enable Indigo CTest tests" FORCE)
 
 # Tests
-set(ENABLE_TESTS OFF CACHE STRING "Enable CTest tests" FORCE)
 
+set(TESTING ON CACHE STRING "Enable Chemivec CTest tests" FORCE)
 add_subdirectory(src)

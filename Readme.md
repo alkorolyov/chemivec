@@ -19,6 +19,10 @@ print(res)
 # Output: array([ True, False]) 
 ```
 
+`Atom-to-atom matching (use_aam)` follows the standard DAYLIGHT SMARTS rules
+declared here https://www.daylight.com/dayhtml/doc/theory/theory.smarts.html (Section 4.6 Reaction Queries).
+If set to `use_aam=False` all atom-mappings are ignored.
+
 
 ### Build
 
@@ -35,10 +39,10 @@ To build and install as a pip package:
 `pip install .`
 
 
-### general notes on configuring packages
+### General notes on configuring skbuild packages
 You may follow the example of https://github.com/scikit-build/scikit-build-sample-projects/tree/master/projects/hello-cpp
 
-If you want to change the library of your package for example to `src/mylib`
+Or if you want to change the directory of your package, for example to `src/mylib`
 ```
 project/
 src/
@@ -51,7 +55,7 @@ pyproject.toml
 setup.py
 ```
 
-Then you need to modify `setup.py` to include the path to packages location.
+Then you need to modify `setup.py` to include package location.
 
 ```python
 from skbuild import setup
@@ -64,16 +68,20 @@ setup(
 ```
 
 Right now your package would be installed into ` ... \cmake-install\src\build`
-So you need to modify your target with C extension to match this folder, so
-setuptools would be aware of it.
+You need to modify your target with C extension to match this folder, so
+`setuptools` would be aware of it and will include it into build and wheel.
 
 ```cmake
-add_library(mylib_c_ext MODULE mylib_c_ext.c)
+python3_add_library(mylib_c_ext MODULE src/mylib_c_ext.c)
 install(TARGETS mylib_c_ext LIBRARY DESTINATION src/mylib)
 ```
 
+### Using cibuildwheels to create distro
+For the moment there is
 
 
-### to check dependencies of your *.pyd library
-### dumpbin should be run from developer command prompt of VS 2022
+### Misc
+To check dependencies of your `*.pyd` library
+dumpbin should be run from developer command prompt of VS 2022
+
 `dumpbin mylib_c_ext.pyd /DEPENDENTS`

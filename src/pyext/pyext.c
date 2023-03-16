@@ -193,7 +193,7 @@ int main() {
 
 
 // Method definition
-PyObject* rxn_match(PyObject* self, PyObject* args, PyObject* kwargs) {
+PyObject* _rxn_match(PyObject* self, PyObject* args, PyObject* kwargs) {
     static char* keywords[] = {"np_input", "query_smarts", "aam_mode", NULL};
 
     PyArrayObject* np_input;
@@ -205,14 +205,13 @@ PyObject* rxn_match(PyObject* self, PyObject* args, PyObject* kwargs) {
         return NULL;
     }
 
-    // Return the NumPy array as a Python object
-    return (PyObject*)reactionMatchVec(np_input, querySmarts, aam_mode);
+    return (PyObject*) reactionMatchPyStr(np_input, querySmarts, aam_mode);
 }
 
 
 // Define the module methods
 static PyMethodDef methods[] = {
-        {"_rxn_match", (PyCFunction) rxn_match, METH_VARARGS | METH_KEYWORDS, "Low level vecorized reaction match"},
+        {"_rxn_match", (PyCFunction) _rxn_match, METH_VARARGS | METH_KEYWORDS, "C-API vecorized reaction match"},
         {NULL, NULL, 0, NULL}   // Sentinel value to indicate end of list
 };
 
