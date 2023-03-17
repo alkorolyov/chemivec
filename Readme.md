@@ -1,7 +1,7 @@
 # Chemivec
 
 Vectorized Cheminformatics Python library, based on EPAM Indigo toolkit C-API
-and using Pandas as NumPy for input/output.
+and using Pandas as NumPy for pinput/poutput.
 
 ### Supported operations:
 rxn_match - reaction substructure match
@@ -77,7 +77,7 @@ install(TARGETS mylib_c_ext LIBRARY DESTINATION src/mylib)
 ```
 
 ### Using cibuildwheels to create distro
-For the moment there is
+cibuildwheels --windows
 
 
 ### Misc

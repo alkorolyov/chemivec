@@ -11,6 +11,7 @@
 
 #include "vec.h"
 
+qword indigoId;
 
 /*
 
@@ -191,7 +192,6 @@ int main() {
 
 */
 
-
 // Method definition
 PyObject* _rxn_match(PyObject* self, PyObject* args, PyObject* kwargs) {
     static char* keywords[] = {"np_input", "query_smarts", "aam_mode", NULL};
@@ -205,7 +205,7 @@ PyObject* _rxn_match(PyObject* self, PyObject* args, PyObject* kwargs) {
         return NULL;
     }
 
-    return (PyObject*) reactionMatchPyStr(np_input, querySmarts, aam_mode);
+    return (PyObject*) reactionMatchNumPy(np_input, querySmarts, aam_mode, indigoId);
 }
 
 
@@ -215,6 +215,15 @@ static PyMethodDef methods[] = {
         {NULL, NULL, 0, NULL}   // Sentinel value to indicate end of list
 };
 
+
+// Define the module deallocation function
+static void free_module(void *module) {
+    indigoSetSessionId(indigoId);
+    if (indigoCountReferences() > 0) {
+        indigoFreeAllObjects();
+    }
+    indigoReleaseSessionId(indigoId);
+}
 
 
 // Define the module structure
@@ -227,14 +236,14 @@ static PyModuleDef module_def = {
         NULL, // Optional slot definitions
         NULL, // Optional traversal function
         NULL, // Optional clear function
-        NULL  // Optional module deallocation function
+        free_module  // Optional module deallocation function
 };
 
 
 // Define module name here by PyInit_<your_modul_ename>
 PyMODINIT_FUNC PyInit__chemivec(void) {
     import_array();
-
+    indigoId = indigoAllocSessionId();
     PyObject* module = PyModule_Create(&module_def);
     return module;
 }

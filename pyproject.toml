@@ -4,6 +4,7 @@ requires = [
     "wheel",
     "scikit-build>=0.13",
     "cmake>=3.15",
+    "pytest",
 #    "ninja; platform_system!='Windows",
     "ninja",
     "numpy"
@@ -12,6 +13,6 @@ build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]
 skip = "cp36-*"
-build = "*"
+build = "cp3{7,9}-*"
 test-requires = "pytest"
 test-command = "pytest {project}/tests"

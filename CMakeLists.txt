@@ -13,5 +13,5 @@ set(ENABLE_TESTS OFF CACHE STRING "Enable Indigo CTest tests" FORCE)
 
 # Tests
 
-set(TESTING ON CACHE STRING "Enable Chemivec CTest tests" FORCE)
+set(TEST_CHEMIVEC ON CACHE STRING "Enable Chemivec CTest tests" FORCE)
 add_subdirectory(src)

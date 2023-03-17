@@ -38,7 +38,7 @@ message(STATUS CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS})
 add_subdirectory(core)
 add_subdirectory(pyext)
 
-if(TESTING)
+if(TEST_CHEMIVEC)
     include(CTest)
     enable_testing()
     add_subdirectory(tests)

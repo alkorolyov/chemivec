@@ -2,6 +2,7 @@
 // Created by ergot on 09/03/2023.
 //
 
+
 #define NO_IMPORT_ARRAY // NumPy C-API is already imported
 #include "vec.h"
 
@@ -25,12 +26,27 @@ PyArrayObject *cstr2numpy(char **strings, int size) {
  */
 char** numpy2cstr(PyArrayObject* np_array) {
     PyObject** pystr = PyArray_DATA(np_array);
-    int size = PyArray_SIZE(np_array);
-    char** cstr = malloc(size * sizeof(char*));
-    for (int i = 0; i < PyArray_SIZE(np_array); i++) {
+    npy_intp size = PyArray_SIZE(np_array);
+    char** cstr = PyMem_Malloc(size * sizeof(char*));
+    for (npy_intp i = 0; i < size; i++) {
         cstr[i] = (char*)PyUnicode_AsUTF8(pystr[i]);
     }
     return cstr;
+}
+
+
+int checkQuerySmarts(char* querySmarts, qword sid){
+    indigoSetSessionId(sid);
+    qword query = indigoLoadReactionSmartsFromString(querySmarts);
+    char message[1024];
+    if (query == -1) {
+        snprintf(message, strlen(querySmarts) * sizeof(char) + 40, "Invalid SMARTS '%s' for reaction query\n", querySmarts);
+        PyErr_SetString(PyExc_ValueError, message);
+        return -1;
+    }
+    indigoFree(query);
+//    indigoReleaseSessionId(sid);
+    return 0;
 }
 
 /***
@@ -45,35 +61,51 @@ char** numpy2cstr(PyArrayObject* np_array) {
 void reactionMatchBatch(struct ReactionBatch* batch, int query, const char *mode) {
     indigoSetSessionId(batch->sid);
     for (int i = 0; i < batch->size; i++) {
-        int rxn = indigoLoadReactionFromString(batch->pin[i]);
+        int rxn = indigoLoadReactionFromString(batch->pinput[i]);
         if (rxn == -1) {
-            printf("Skipping invalid reaction smiles:\n  %s\n", batch->pin[i]);
-            batch->pout[i] = NPY_FALSE;
+            printf("[%d %d] Invalid SMILES: %s\n", batch->threadid, i, batch->pinput[i]);
+            batch->poutput[i] = NPY_FALSE;
             continue;
         }
         int matcher = indigoSubstructureMatcher(rxn, mode);
         int match = indigoMatch(matcher, query);
         if (match != 0)
-            batch->pout[i] = NPY_TRUE;
+            batch->poutput[i] = NPY_TRUE;
         else
-            batch->pout[i] = NPY_FALSE;
-//        printf("thr[%i]:\n in = %s\n out[%i] = %i\n", batch->threadNum, batch->pin[i], i, batch->pout[i]);
-        finishSearch(rxn, matcher, match);
+            batch->poutput[i] = NPY_FALSE;
+        // debug info
+//        printf("[%i %i]:\n in =  %s\n out = %i\n", batch->threadid, i, batch->pinput[i], batch->poutput[i]);
+        indigoFree(rxn);
+        indigoFree(matcher);
+        indigoFree(match);
     }
 }
 
 
+void reactionMatchLin(char **in_data, npy_bool *out_data, int size, char *querySmarts, const char *mode) {
+    // Single Thread
+    
+    struct ReactionBatch* batch = PyMem_Malloc(sizeof(struct ReactionBatch));
+    batch->sid = indigoAllocSessionId();
+    batch->threadid = 0;
+    batch->pinput = in_data;
+    batch->poutput = out_data;
+    batch->size = size;
 
-PyArrayObject *reactionMatchPyStr(PyArrayObject * np_input, char* querySmarts, char* aam_mode) {
-    int size = PyArray_SIZE(np_input);
-    char ** in_data = numpy2cstr(np_input);
+    qword query = indigoLoadReactionSmartsFromString(querySmarts);
+    if (query == -1) {
+        printf("Invalid SMARTS: %s", querySmarts);
+        return;
+    }
+    indigoOptimize(query, NULL);
 
-    PyArrayObject* np_output = reactionMatchVec(in_data, size, querySmarts, aam_mode);
+    reactionMatchBatch(batch, query, mode);
 
-    free(in_data);
-    return np_output;
+    indigoFree(query);
+    indigoReleaseSessionId(batch->sid);
+    PyMem_Free(batch);
+    return;
 }
-
 
 /**
  * Vectorized version of reaction match. Creates new
@@ -83,59 +115,36 @@ PyArrayObject *reactionMatchPyStr(PyArrayObject * np_input, char* querySmarts, c
  * @param mode "DAYLIGHT-AAM" or NULL
  * @return
  */
-PyArrayObject *reactionMatchVec(char **in_data, int size, char *querySmarts, const char *mode) {
-    // Create output array of the same size as input
-    npy_intp dims[] = {size};
-    PyArrayObject* np_output = (PyArrayObject*)PyArray_EMPTY(1, dims, NPY_BOOL, NPY_ARRAY_C_CONTIGUOUS);
-    npy_bool* out_data = (npy_bool*) PyArray_DATA(np_output); // output boolean array
+void reactionMatchVec(char **in_data, npy_bool *out_data, int size, char *querySmarts, const char *mode) {
 
-    // Single Thread
-/*
-    qword query = indigoLoadReactionSmartsFromString(querySmarts);
-    indigoOptimize(query, NULL);
-    struct ReactionBatch batch;
-    batch.pin = in_data;
-    batch.pout = PyArray_DATA(np_output);
-    batch.size = size;
-    batch.threadNum = 0;
-    batch.sid = indigoAllocSessionId();
-
-    reactionMatchBatch(&batch, query, mode);
-
-    indigoFree(query);
-    indigoReleaseSessionId(batch.sid);
-*/
-
+//    if (checkQuerySmarts(querySmarts) == -1) {
+//        return NULL;
+//    };
 
     // Multi Thread
     int num_threads = omp_get_max_threads();
     int batch_size = size / num_threads;
 
+    // NO PYTHON FUNCTIONS HERE
     #pragma omp parallel num_threads(num_threads)
     {
         // Create batch per each thread
         struct ReactionBatch* batch = malloc(sizeof(struct ReactionBatch));
         batch->sid = indigoAllocSessionId();
-        if (batch->sid == -1) {
-            printf("Indigo allocate session failed\n");
-            exit(EXIT_FAILURE);
-        }
-        batch->threadNum = omp_get_thread_num();
-
-        int start_idx = batch->threadNum * batch_size;
+        batch->threadid = omp_get_thread_num();
+        int start_idx = batch->threadid * batch_size;
         int end_idx = start_idx + batch_size;
-        batch->pin = in_data + start_idx;
-        batch->pout = out_data + start_idx;
-        // last batch
-        if (batch->threadNum == num_threads - 1) {
-            end_idx = size;
+        if (batch->threadid == num_threads - 1) {
+            end_idx = size; // last batch
         }
+        batch->pinput = in_data + start_idx;
+        batch->poutput = out_data + start_idx;
         batch->size = end_idx - start_idx;
 
         // Create query object
         int query = indigoLoadReactionSmartsFromString(querySmarts);
         if (query == -1) {
-            printf("Invalid SMARTS for reaction query:\n  %s\n", querySmarts);
+            printf("Invalid SMARTS %s\n", querySmarts);
             exit(EXIT_FAILURE);
         }
         indigoOptimize(query, NULL);
@@ -147,10 +156,34 @@ PyArrayObject *reactionMatchVec(char **in_data, int size, char *querySmarts, con
         free(batch);
     }
 
-//    printf("%s", indigoGetLastError());
-
-    return np_output;
+    return;
 }
 
+
+PyArrayObject *reactionMatchNumPy(PyArrayObject *np_input, char *querySmarts, char *aam_mode, qword moduleIndigoId) {
+//    if (checkQuerySmarts(querySmarts) == -1) {
+//        return NULL;
+//    }
+
+    // check query SMARTS
+    if (checkQuerySmarts(querySmarts, moduleIndigoId) == -1) {
+        return NULL;
+    };
+
+
+    int size = PyArray_SIZE(np_input);
+    npy_intp dims[] = {size};
+    char ** in_data = numpy2cstr(np_input);
+
+    PyArrayObject* np_output = (PyArrayObject*)PyArray_EMPTY(1, dims, NPY_BOOL, NPY_ARRAY_C_CONTIGUOUS);
+    npy_bool* out_data = (npy_bool*) PyArray_DATA(np_output); // output boolean array
+
+    reactionMatchVec(in_data, out_data, size, querySmarts, aam_mode);
+//    reactionMatchLin(in_data, out_data, size, querySmarts, aam_mode);
+
+    PyMem_Free(in_data);
+    PyArray_XDECREF(np_output);
+    return np_output;
+}
 
 

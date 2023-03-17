@@ -38,10 +38,10 @@ def rxn_match(arr: Union[np.ndarray, pd.DataFrame, pd.Series, list],
     arr = _convert_to_numpy(arr)
 
     # check item type
-    # using direct type check because 'np.str_' is also instance of 'str'
-    if type(arr[0] == str):
-        return _rxn_match(arr, query_smarts, aam_mode)
-    elif type(arr[0] == np.str_):
+    # first check 'np.str_' because it is subclass of 'str'
+    if isinstance(arr[0], np.str_):
         return _rxn_match(arr.astype(object), query_smarts, aam_mode)
-    else:
-        raise ValueError(f"Input should be array of python or numpy strings, instead got array of {type(arr[0])}")
+    elif isinstance(arr[0], str):
+        return _rxn_match(arr.astype(object), query_smarts, aam_mode)
+
+    raise ValueError(f"Input should be array of python or numpy strings, instead got array of {type(arr[0])}")
