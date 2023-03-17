@@ -89,7 +89,7 @@ def test_numpy_npstr():
         return
 
     try:
-        res = rxn_match(arr, query_smarts=query, use_aam=True)
+        res = rxn_match(arr, query_smarts=query)
         print(f"OK")
     except Exception as e:
         print(f"FAILED\n{e}")

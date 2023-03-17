@@ -22,18 +22,12 @@ def _convert_to_numpy(arr: Union[np.ndarray, pd.DataFrame, pd.Series, list]) -> 
                          f"got {type(arr)} type instead")
     return arr
 
-def rxn_match(arr: Union[np.ndarray, pd.DataFrame, pd.Series, list],
-            query_smarts: str = None,
-            use_aam: bool = False) -> np.ndarray:
+def rxn_match(arr: Union[np.ndarray, pd.DataFrame, pd.Series, list], query_smarts: str = None,
+              aam_mode: str = "DAYLIGHT-AAM") -> np.ndarray:
 
     # query smarts
     if query_smarts is None or not query_smarts:
         raise ValueError(f"query_smarts could not be empty or None, should be a SMARTS string")
-
-    # atom-to-atom mapping mode
-    aam_mode = ""
-    if use_aam:
-        aam_mode = "DAYLIGHT-AAM"
 
     arr = _convert_to_numpy(arr)
 
