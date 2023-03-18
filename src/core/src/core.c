@@ -4,7 +4,7 @@
 
 
 #define NO_IMPORT_ARRAY // NumPy C-API is already imported
-#include "vec.h"
+#include "core.h"
 
 PyArrayObject *cstr2numpy(char **strings, int size) {
     npy_intp dims[] = {size};
@@ -51,14 +51,11 @@ int checkQuerySmarts(char* querySmarts, qword sid){
 
 /***
  * Reaction substructure search for single batch.
- * @param input C string array of rxn smiles
- * @param output boolean array of match results
- * @param size size of batch to process
+ * @param batch pointer to ReactionBatch object
  * @param query handle of indigo Query object
- * @param mode "DAYLIGHT-AAM" or NULL
- * @param id Indigo session id
+ * @param mode "DAYLIGHT-AAM" or ignored
  */
-void reactionMatchBatch(struct ReactionBatch* batch, int query, const char *mode) {
+void reactionMatchBatch(ReactionBatch* batch, int query, const char *mode) {
     indigoSetSessionId(batch->sid);
     for (int i = 0; i < batch->size; i++) {
         int rxn = indigoLoadReactionFromString(batch->pinput[i]);
@@ -73,7 +70,7 @@ void reactionMatchBatch(struct ReactionBatch* batch, int query, const char *mode
             batch->poutput[i] = NPY_TRUE;
         else
             batch->poutput[i] = NPY_FALSE;
-        // debug info
+//        debug info
 //        printf("[%i %i]:\n in =  %s\n out = %i\n", batch->threadid, i, batch->pinput[i], batch->poutput[i]);
         indigoFree(rxn);
         indigoFree(matcher);
@@ -85,7 +82,7 @@ void reactionMatchBatch(struct ReactionBatch* batch, int query, const char *mode
 void reactionMatchLin(char **in_data, npy_bool *out_data, int size, char *querySmarts, const char *mode) {
     // Single Thread
     
-    struct ReactionBatch* batch = PyMem_Malloc(sizeof(struct ReactionBatch));
+    ReactionBatch* batch = PyMem_Malloc(sizeof(ReactionBatch));
     batch->sid = indigoAllocSessionId();
     batch->threadid = 0;
     batch->pinput = in_data;
@@ -115,21 +112,21 @@ void reactionMatchLin(char **in_data, npy_bool *out_data, int size, char *queryS
  * @param mode "DAYLIGHT-AAM" or NULL
  * @return
  */
-void reactionMatchVec(char **in_data, npy_bool *out_data, int size, char *querySmarts, const char *mode) {
+void reactionMatchVec(char **in_data, npy_bool *out_data, int size, char *querySmarts, const char *mode, int numCores) {
 
 //    if (checkQuerySmarts(querySmarts) == -1) {
 //        return NULL;
 //    };
 
     // Multi Thread
-    int num_threads = omp_get_max_threads();
+    int num_threads = numCores;
     int batch_size = size / num_threads;
 
     // NO PYTHON FUNCTIONS HERE
     #pragma omp parallel num_threads(num_threads)
     {
         // Create batch per each thread
-        struct ReactionBatch* batch = malloc(sizeof(struct ReactionBatch));
+        ReactionBatch* batch = malloc(sizeof(ReactionBatch));
         batch->sid = indigoAllocSessionId();
         batch->threadid = omp_get_thread_num();
         int start_idx = batch->threadid * batch_size;
@@ -144,7 +141,7 @@ void reactionMatchVec(char **in_data, npy_bool *out_data, int size, char *queryS
         // Create query object
         int query = indigoLoadReactionSmartsFromString(querySmarts);
         if (query == -1) {
-            printf("Invalid SMARTS %s\n", querySmarts);
+            printf("Invalid reaction SMARTS %s\n", querySmarts);
             exit(EXIT_FAILURE);
         }
         indigoOptimize(query, NULL);
@@ -160,13 +157,17 @@ void reactionMatchVec(char **in_data, npy_bool *out_data, int size, char *queryS
 }
 
 
-PyArrayObject *reactionMatchNumPy(PyArrayObject *np_input, char *querySmarts, char *aam_mode, qword moduleIndigoId) {
+PyArrayObject *
+reactionMatchNumPy(PyArrayObject *np_input, char *querySmarts, char *aamMode, int numCores, ChemivecOptions *options) {
 //    if (checkQuerySmarts(querySmarts) == -1) {
 //        return NULL;
 //    }
 
+    // set num_cores
+
+
     // check query SMARTS
-    if (checkQuerySmarts(querySmarts, moduleIndigoId) == -1) {
+    if (checkQuerySmarts(querySmarts, options->sid) == -1) {
         return NULL;
     };
 
@@ -178,7 +179,7 @@ PyArrayObject *reactionMatchNumPy(PyArrayObject *np_input, char *querySmarts, ch
     PyArrayObject* np_output = (PyArrayObject*)PyArray_EMPTY(1, dims, NPY_BOOL, NPY_ARRAY_C_CONTIGUOUS);
     npy_bool* out_data = (npy_bool*) PyArray_DATA(np_output); // output boolean array
 
-    reactionMatchVec(in_data, out_data, size, querySmarts, aam_mode);
+    reactionMatchVec(in_data, out_data, size, querySmarts, aamMode, numCores);
 //    reactionMatchLin(in_data, out_data, size, querySmarts, aam_mode);
 
     PyMem_Free(in_data);

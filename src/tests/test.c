@@ -7,7 +7,7 @@
 #define PY_ARRAY_UNIQUE_SYMBOL CHEMIVEC_ARRAY_API
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include "numpy/arrayobject.h"
-#include "vec.h"
+#include "core.h"
 #include "unity.h"
 //#include <assert.h>
 
@@ -91,7 +91,7 @@ void test_reaction_vec() {
     int size = 2;
 
     char* querySmarts = "[C:1]=O>>[C:1]O";
-    reactionMatchVec(input, output, size, querySmarts, "DAYLIGHT-AAM");
+    reactionMatchVec(input, output, size, querySmarts, "DAYLIGHT-AAM", 0);
     TEST_ASSERT_EQUAL(output[0], 1);
     TEST_ASSERT_EQUAL(output[1], 0);
 }
@@ -128,11 +128,13 @@ void test_incorrect_smi_vec() {
     int size = 3;
 
     char* querySmarts = "[C:1]=O>>[C:1]O";
-    reactionMatchVec(input, output, size, querySmarts, "DAYLIGHT-AAM");
+    reactionMatchVec(input, output, size, querySmarts, "DAYLIGHT-AAM", 0);
     TEST_ASSERT_EQUAL(output[0], 0);
     TEST_ASSERT_EQUAL(output[1], 0);
     TEST_ASSERT_EQUAL(output[2], 0);
 }
+
+
 
 int main(void) {
     UNITY_BEGIN();

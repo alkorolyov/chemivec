@@ -13,7 +13,7 @@ from chemivec import rxn_match
 
 arr = np.array(['[C:1]=O>>[C:1]O', 'C=O>>CO'])
 query = "[C:1]=[O]>>[C:1]-[O]"
-res = rxn_match(arr, query_smarts=query, use_aam=True)
+res = rxn_match(arr, query_smarts=query)
 print(res)
 
 # Output: array([ True, False]) 

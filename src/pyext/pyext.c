@@ -9,9 +9,39 @@
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include "numpy/arrayobject.h"
 
-#include "vec.h"
+#include "core.h"
 
-qword indigoId;
+
+static ChemivecOptions* options;
+
+static int initOptions(qword SessionId) {
+    options = (ChemivecOptions*) PyMem_Malloc(sizeof(options));
+    if (options == NULL) {
+        return -1;
+    }
+    options->sid = SessionId;
+    options->num_cores = omp_get_max_threads();
+    return 0;
+}
+
+// Define the module deallocation function
+static void freeModule() {
+    // Indigo
+    indigoSetSessionId(options->sid);
+    if (indigoCountReferences() > 0) {
+        indigoFreeAllObjects();
+    }
+    indigoReleaseSessionId(options->sid);
+
+    // Module Options
+    PyMem_Free(options);
+}
+
+static void setNumCores(int numCores) {
+    options->num_cores = numCores;
+    if (options->num_cores == 0 || numCores > omp_get_max_threads())
+        options->num_cores = omp_get_max_threads();
+}
 
 /*
 
@@ -192,38 +222,83 @@ int main() {
 
 */
 
-// Method definition
-PyObject* _rxn_match(PyObject* self, PyObject* args, PyObject* kwargs) {
-    static char* keywords[] = {"np_input", "query_smarts", "aam_mode", NULL};
+// Methods definition
 
-    PyArrayObject* np_input;
-    char* querySmarts;
-    char* aam_mode;
-
-    // Parse the arguments using PyArg_ParseTuple
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "Oss", keywords, &np_input, &querySmarts, &aam_mode)) {
+/**
+ * Set option by name
+ * Option names and values always passed as Unicode Python strings
+ * type checking is done on the python side
+ * @param self
+ * @param args option name, option value as python strings
+ * @return None if successful
+ */
+PyObject* _set_option(PyObject* self, PyObject* args) {
+    char* option_name;
+    char* option_value;
+    if (!PyArg_ParseTuple(args, "ss", &option_name, &option_value)) {
         return NULL;
     }
 
-    return (PyObject*) reactionMatchNumPy(np_input, querySmarts, aam_mode, indigoId);
+    if (strcmp(option_name, "num_cores") == 0) {
+        setNumCores(atoi(option_value));
+//        printf("set num_cores: %d\n", options->num_cores);
+        return Py_None;
+    } else {
+        printf("Option %s not allowed\n", option_name);
+        return NULL;
+    }
 }
+
+/**
+ * Get option by name
+ * @param self
+ * @param args option name
+ * @return option value, always python string
+ */
+PyObject* _get_option(PyObject* self, PyObject* args) {
+    char* option_name;
+    if (!PyArg_ParseTuple(args, "s", &option_name)) {
+        return NULL;
+    }
+
+    if (strcmp(option_name, "num_cores") == 0) {
+//        printf("get num_cores: %d\n", options->num_cores);
+        PyObject* value = PyUnicode_FromFormat("%d", options->num_cores);
+//        Py_DecRef(value);
+        return value;
+    } else {
+        printf("Option %s not found\n");
+        return NULL;
+    }
+
+}
+
+PyObject* _rxn_match(PyObject* self, PyObject* args, PyObject* kwargs) {
+    static char* keywords[] = {"np_input", "query_smarts", "aam_mode", "num_cores", NULL};
+
+    PyArrayObject* np_input;
+    char* querySmarts;
+    char* aamMode;
+    int numCores;
+
+    // Parse the arguments using PyArg_ParseTuple
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "Ossi", keywords, &np_input, &querySmarts, &aamMode, &numCores)) {
+        return NULL;
+    }
+
+    return (PyObject*) reactionMatchNumPy(np_input, querySmarts, aamMode, numCores, options);
+}
+
 
 
 // Define the module methods
 static PyMethodDef methods[] = {
         {"_rxn_match", (PyCFunction) _rxn_match, METH_VARARGS | METH_KEYWORDS, "C-API vecorized reaction match"},
+        {"_set_option", (PyCFunction) _set_option, METH_VARARGS, "Set option"},
+        {"_get_option", (PyCFunction) _get_option, METH_VARARGS, "Get option"},
         {NULL, NULL, 0, NULL}   // Sentinel value to indicate end of list
 };
 
-
-// Define the module deallocation function
-static void free_module(void *module) {
-    indigoSetSessionId(indigoId);
-    if (indigoCountReferences() > 0) {
-        indigoFreeAllObjects();
-    }
-    indigoReleaseSessionId(indigoId);
-}
 
 
 // Define the module structure
@@ -236,14 +311,15 @@ static PyModuleDef module_def = {
         NULL, // Optional slot definitions
         NULL, // Optional traversal function
         NULL, // Optional clear function
-        free_module  // Optional module deallocation function
+        freeModule  // Optional module deallocation function
 };
 
 
 // Define module name here by PyInit_<your_modul_ename>
 PyMODINIT_FUNC PyInit__chemivec(void) {
     import_array();
-    indigoId = indigoAllocSessionId();
+    qword SessionId = indigoAllocSessionId();
+    initOptions(SessionId);
     PyObject* module = PyModule_Create(&module_def);
     return module;
 }
