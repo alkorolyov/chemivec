@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import pytest
+import re
+import io
 import os
 import sys
 import multiprocessing as mp
@@ -56,11 +58,15 @@ def test_pandas_series():
     assert not res[1]
 
 
-def test_bad_reaction_smiles():
+def test_bad_reaction_smiles(capfd):
     arr = np.array(['C]>>'])
     query = "C>>"
+
     res = rxn_match(arr, query_smarts=query)
+    captured = capfd.readouterr()
+
     assert not res[0]
+    # assert captured.out == "[23 0] Invalid SMILES: C]>>"
 
 
 def test_bad_query():
@@ -102,17 +108,34 @@ def test_no_aam_query():
     assert res[4]
 
 
+def test_get_default_num_cores():
+    assert get_option("num_cores") == mp.cpu_count()
+
+
 def test_set_option_num_cores_int():
     set_option("num_cores", 10)
+    assert get_option("num_cores") == 10
+
+def test_set_float_num_cores():
+    with pytest.raises(TypeError, match="float type not allowed, int or string expected"):
+        set_option("num_cores", 1.1)
+
+
+def test_set_negative_num_cores():
+    with pytest.raises(ValueError, match="Negative 'num_cores' not allowed"):
+        set_option("num_cores", -1)
+
+def test_set_bad_str_num_cores():
+    with pytest.raises(ValueError):
+        set_option("num_cores", "1.1")
+    with pytest.raises(ValueError):
+        set_option("num_cores", "1a")
 
 
 def test_set_option_num_cores_str():
-    set_option("num_cores", "24")
+    set_option("num_cores", "12")
+    assert get_option("num_cores") == 12
 
-
-def test_get_option_num_cores():
-    set_option("num_cores", 1)
-    assert get_option("num_cores") == 1
 
 def test_set_zero_num_cores():
     set_option("num_cores", 0)
@@ -121,5 +144,7 @@ def test_set_zero_num_cores():
 def test_set_big_num_cores():
     set_option("num_cores", mp.cpu_count() * 2)
     assert get_option("num_cores") == mp.cpu_count()
+
+
 
 

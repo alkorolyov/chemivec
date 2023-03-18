@@ -39,7 +39,5 @@ add_subdirectory(core)
 add_subdirectory(pyext)
 
 if(TEST_CHEMIVEC)
-    include(CTest)
-    enable_testing()
     add_subdirectory(tests)
 endif()

@@ -37,11 +37,6 @@ static void freeModule() {
     PyMem_Free(options);
 }
 
-static void setNumCores(int numCores) {
-    options->num_cores = numCores;
-    if (options->num_cores == 0 || numCores > omp_get_max_threads())
-        options->num_cores = omp_get_max_threads();
-}
 
 /*
 
@@ -240,7 +235,7 @@ PyObject* _set_option(PyObject* self, PyObject* args) {
     }
 
     if (strcmp(option_name, "num_cores") == 0) {
-        setNumCores(atoi(option_value));
+        options->num_cores = atoi(option_value);
 //        printf("set num_cores: %d\n", options->num_cores);
         return Py_None;
     } else {

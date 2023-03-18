@@ -9,7 +9,6 @@
 #include "numpy/arrayobject.h"
 #include "core.h"
 #include "unity.h"
-//#include <assert.h>
 
 void setUp (void) {} /* Is run before every test, put unit init calls here. */
 void tearDown (void) {} /* Is run after every test, put unit clean-up calls here. */
@@ -48,7 +47,7 @@ void test_reaction_batch() {
     npy_bool output[2];
     int size = 2;
 
-    struct ReactionBatch batch;
+    ReactionBatch batch;
     batch.sid = sid;
     batch.pinput = input;
     batch.poutput = output;
@@ -101,7 +100,7 @@ void test_incorrect_smi_batch() {
     npy_bool output[] = {1};
     int size = 1;
 
-    struct ReactionBatch batch;
+    ReactionBatch batch;
     batch.sid = sid;
     batch.pinput = input;
     batch.poutput = output;

@@ -1,8 +1,10 @@
 from typing import Union
 import numpy as np
 import pandas as pd
+import multiprocessing as mp
 
 from ._chemivec import _rxn_match
+from .options import get_option, set_option, _check_num_cores
 
 def _convert_to_numpy(arr: Union[np.ndarray, pd.DataFrame, pd.Series, list]) -> np.ndarray:
     # Check the array type and convert everything to numpy
@@ -23,8 +25,10 @@ def _convert_to_numpy(arr: Union[np.ndarray, pd.DataFrame, pd.Series, list]) -> 
     return arr
 
 
-def rxn_match(arr: Union[np.ndarray, pd.DataFrame, pd.Series, list], query_smarts: str = None,
-              aam_mode: str = "DAYLIGHT-AAM") -> np.ndarray:
+def rxn_match(arr: Union[np.ndarray, pd.DataFrame, pd.Series, list],
+              query_smarts: str = None,
+              aam_mode: str = "DAYLIGHT-AAM",
+              num_cores: Union[int, None] = None) -> np.ndarray:
     """
     Vectorized reaction substructure search. Input SMILES array and query SMARTS. Both should
     be reactions, e.g. contains ">>" sign. By default uses daylight atom-to-atom mapping rules:
@@ -41,6 +45,7 @@ def rxn_match(arr: Union[np.ndarray, pd.DataFrame, pd.Series, list], query_smart
                   )
         output: array([ True, True])
 
+    :param num_cores:
     :param arr: input array of reaction SMILES, supported inputs: np.ndarray, pd.DataFrame, pd.Series, list
     :param query_smarts: (str) reaction SMARTS
     :param aam_mode: (str) by defaylt "DAYLIGHT-AAM"
@@ -49,17 +54,22 @@ def rxn_match(arr: Union[np.ndarray, pd.DataFrame, pd.Series, list], query_smart
     # query smarts
     if query_smarts is None or not query_smarts:
         raise ValueError(f"query_smarts could not be empty or None, should be a SMARTS string")
+    # TODO check smarts
+
+    # num_cores
+    if num_cores:
+        num_cores = _check_num_cores(int(num_cores))
+    else:
+        num_cores = get_option("num_cores")
 
     arr = _convert_to_numpy(arr)
-
-    num_cores = 1
 
     # check item type
     # first check 'np.str_' because it is subclass of 'str'
     if isinstance(arr[0], np.str_):
         return _rxn_match(arr.astype(object), query_smarts, aam_mode, num_cores)
     elif isinstance(arr[0], str):
-        return _rxn_match(arr.astype(object), query_smarts, aam_mode, num_cores)
+        return _rxn_match(arr, query_smarts, aam_mode, num_cores)
 
     raise ValueError(f"Input should be array of python or numpy strings, instead got array of {type(arr[0])}")
 
