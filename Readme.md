@@ -19,9 +19,8 @@ print(res)
 # Output: array([ True, False]) 
 ```
 
-`Atom-to-atom matching (use_aam)` follows the standard DAYLIGHT SMARTS rules
+`Atom-to-atom matching` follows the standard DAYLIGHT SMARTS rules
 declared here https://www.daylight.com/dayhtml/doc/theory/theory.smarts.html (Section 4.6 Reaction Queries).
-If set to `use_aam=False` all atom-mappings are ignored.
 
 
 ### Build
