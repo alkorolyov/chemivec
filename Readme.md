@@ -1,27 +1,48 @@
 # Chemivec
 
 Vectorized Cheminformatics Python library, based on EPAM Indigo toolkit C-API
-and using Pandas as NumPy for pinput/poutput.
+and using NumPy for input/output.
 
 ### Supported operations:
-rxn_match - reaction substructure match
+`rxn_match` - reaction substructure match
+
+    `input`         : reaction SMILES array (numpy, pandas and python list supported)
+    `query_smarts`  : reaction query SMARTS
 
 ### Example usage:
+
 ```python
+import chemivec as cv
 import numpy as np
-from chemivec import rxn_match
 
 arr = np.array(['[C:1]=O>>[C:1]O', 'C=O>>CO'])
 query = "[C:1]=[O]>>[C:1]-[O]"
-res = rxn_match(arr, query_smarts=query)
+res = cv.rxn_match(arr, query_smarts=query)
 print(res)
 
 # Output: array([ True, False]) 
 ```
 
+### Multithreading
+
+Multithreading realized by OpenMP library. By default, tries to use maximum available number of cores.
+Number of cores can be specified as a global option or passed as a parameter.
+
+```python
+import chemivec as cv
+
+cv.rxn_match(arr, query_smarts=query)   # default max available cores
+cv.set_option("num_cores", 12)          # change defaults
+cv.rxn_match(arr, query_smarts=query, num_cores=8)
+```
+
 `Atom-to-atom matching` follows the standard DAYLIGHT SMARTS rules
 declared here https://www.daylight.com/dayhtml/doc/theory/theory.smarts.html (Section 4.6 Reaction Queries).
 
+
+### Install
+
+`pip install chemivec`
 
 ### Build
 

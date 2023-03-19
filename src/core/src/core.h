@@ -31,6 +31,8 @@ PyArrayObject* cstr2numpy(char** strings, int size);
 
 char** numpy2cstr(PyArrayObject * np_array);
 
+int checkReactionSmarts(char* smarts, qword sid);
+
 void reactionMatchBatch(ReactionBatch* batch, int query, const char *mode);
 
 void reactionMatchLin(char **in_data, npy_bool *out_data, int size, char *querySmarts, const char *mode);

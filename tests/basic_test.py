@@ -15,13 +15,13 @@ except ModuleNotFoundError:
     # clion build
     # run command `pytest ./tests` from root project folder
     sys.path.append(os.getcwd())
-    from src.chemivec import rxn_match, set_option, get_option
+    from src.chemivec import rxn_subsearch, set_option, get_option
 
 
 def test_numpy_npstr():
     arr = np.array(['[C:1]=O>>[C:1]O', 'C=O>>CO'])
     query = "[C:1]=O>>[C:1]O"
-    res = rxn_match(arr, query_smarts=query)
+    res = rxn_subsearch(arr, query_smarts=query)
     assert res[0]
     assert not res[1]
 
@@ -29,7 +29,7 @@ def test_numpy_npstr():
 def test_numpy_pystr():
     arr = np.array(['[C:1]=O>>[C:1]O', 'C=O>>CO'], dtype=object)
     query = "[C:1]=O>>[C:1]O"
-    res = rxn_match(arr, query_smarts=query)
+    res = rxn_subsearch(arr, query_smarts=query)
     assert res[0]
     assert not res[1]
 
@@ -37,7 +37,7 @@ def test_numpy_pystr():
 def test_pylist():
     arr = ['[C:1]=O>>[C:1]O', 'C=O>>CO']
     query = "[C:1]=O>>[C:1]O"
-    res = rxn_match(arr, query_smarts=query)
+    res = rxn_subsearch(arr, query_smarts=query)
     assert res[0]
     assert not res[1]
 
@@ -45,7 +45,7 @@ def test_pylist():
 def test_pandas_pd():
     arr = pd.DataFrame(['[C:1]=O>>[C:1]O', 'C=O>>CO'])
     query = "[C:1]=O>>[C:1]O"
-    res = rxn_match(arr, query_smarts=query)
+    res = rxn_subsearch(arr, query_smarts=query)
     assert res[0]
     assert not res[1]
 
@@ -53,7 +53,7 @@ def test_pandas_pd():
 def test_pandas_series():
     arr = pd.Series(['[C:1]=O>>[C:1]O', 'C=O>>CO'])
     query = "[C:1]=O>>[C:1]O"
-    res = rxn_match(arr, query_smarts=query)
+    res = rxn_subsearch(arr, query_smarts=query)
     assert res[0]
     assert not res[1]
 
@@ -62,7 +62,7 @@ def test_bad_reaction_smiles(capfd):
     arr = np.array(['C]>>'])
     query = "C>>"
 
-    res = rxn_match(arr, query_smarts=query)
+    res = rxn_subsearch(arr, query_smarts=query)
     captured = capfd.readouterr()
 
     assert not res[0]
@@ -72,8 +72,8 @@ def test_bad_reaction_smiles(capfd):
 def test_bad_query():
     arr = np.array(['C>>'])
     query = "[C>>"
-    with pytest.raises(ValueError, match="Invalid SMARTS"):
-        rxn_match(arr, query_smarts=query)
+    with pytest.raises(ValueError, match="Invalid reaction SMARTS"):
+        rxn_subsearch(arr, query_smarts=query)
 
 
 def test_aam_mode():
@@ -84,7 +84,7 @@ def test_aam_mode():
                     'C=O>>CO'
                     ])
     query = "[C:1]=O>>[C:1]O"
-    res = rxn_match(arr, query_smarts=query)
+    res = rxn_subsearch(arr, query_smarts=query)
     assert res[0]
     assert not res[1]
     assert not res[2]
@@ -100,7 +100,7 @@ def test_no_aam_query():
                     'C=O>>CO'
                     ])
     query = "C=O>>[C:1]O"
-    res = rxn_match(arr, query_smarts=query)
+    res = rxn_subsearch(arr, query_smarts=query)
     assert res[0]
     assert res[1]
     assert res[2]

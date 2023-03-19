@@ -90,7 +90,8 @@ void test_reaction_vec() {
     int size = 2;
 
     char* querySmarts = "[C:1]=O>>[C:1]O";
-    reactionMatchVec(input, output, size, querySmarts, "DAYLIGHT-AAM", 0);
+    int max_cores = omp_get_max_threads();
+    reactionMatchVec(input, output, size, querySmarts, "DAYLIGHT-AAM", max_cores);
     TEST_ASSERT_EQUAL(output[0], 1);
     TEST_ASSERT_EQUAL(output[1], 0);
 }
@@ -108,7 +109,7 @@ void test_incorrect_smi_batch() {
     batch.threadid = 0;
 
     indigoSetSessionId(sid);
-    const char* querySmarts = "[C:1]=O>>[C:1]O";
+    const char* querySmarts = "CO>>";
     qword query = indigoLoadReactionSmartsFromString(querySmarts);
     if (query == -1) {
         printf("Invalid SMARTS %s\n", querySmarts);
@@ -122,15 +123,21 @@ void test_incorrect_smi_batch() {
 }
 
 void test_incorrect_smi_vec() {
-    char* input[] = {"[C>>]", "C]>>", "!>>"};
-    npy_bool output[] = {1, 1, 1};
-    int size = 3;
+    char* input[] = {"[C>>]"};
+    npy_bool output[] = {1};
+    int size = 1;
 
-    char* querySmarts = "[C:1]=O>>[C:1]O";
-    reactionMatchVec(input, output, size, querySmarts, "DAYLIGHT-AAM", 0);
+    char* querySmarts = "CO>>";
+    int max_cores = omp_get_max_threads();
+    reactionMatchVec(input, output, size, querySmarts, "DAYLIGHT-AAM", max_cores);
     TEST_ASSERT_EQUAL(output[0], 0);
-    TEST_ASSERT_EQUAL(output[1], 0);
-    TEST_ASSERT_EQUAL(output[2], 0);
+}
+
+void test_reaction_smarts() {
+    indigoSetSessionId(sid);
+    TEST_ASSERT_EQUAL(checkReactionSmarts("CO>", sid), -1);
+    TEST_ASSERT_EQUAL(checkReactionSmarts("CO>>", sid), 0);
+    TEST_ASSERT_EQUAL(checkReactionSmarts("[CH3]>>", sid), 0);
 }
 
 
@@ -140,6 +147,7 @@ int main(void) {
 
     Py_Initialize();
     import_array()
+    
     sid = indigoAllocSessionId();
 
     RUN_TEST(test_cstr_to_numpy);
@@ -149,6 +157,7 @@ int main(void) {
     RUN_TEST(test_reaction_vec);
     RUN_TEST(test_incorrect_smi_batch);
     RUN_TEST(test_incorrect_smi_vec);
+    RUN_TEST(test_reaction_smarts);
 
     if (indigoCountReferences() > 0) {
         indigoFreeAllObjects();

@@ -35,17 +35,13 @@ char** numpy2cstr(PyArrayObject* np_array) {
 }
 
 
-int checkQuerySmarts(char* querySmarts, qword sid){
+int checkReactionSmarts(char* smarts, qword sid){
     indigoSetSessionId(sid);
-    qword query = indigoLoadReactionSmartsFromString(querySmarts);
-    char message[1024];
+    qword query = indigoLoadReactionSmartsFromString(smarts);
     if (query == -1) {
-        snprintf(message, strlen(querySmarts) * sizeof(char) + 40, "Invalid SMARTS '%s' for reaction query\n", querySmarts);
-        PyErr_SetString(PyExc_ValueError, message);
         return -1;
     }
     indigoFree(query);
-//    indigoReleaseSessionId(sid);
     return 0;
 }
 
@@ -60,7 +56,7 @@ void reactionMatchBatch(ReactionBatch* batch, int query, const char *mode) {
     for (int i = 0; i < batch->size; i++) {
         int rxn = indigoLoadReactionFromString(batch->pinput[i]);
         if (rxn == -1) {
-            printf("[%d %d] Invalid SMILES: %s\n", batch->threadid, i, batch->pinput[i]);
+            printf("Invalid reaction SMILES: %s\n", batch->pinput[i]);
             batch->poutput[i] = NPY_FALSE;
             continue;
         }
@@ -70,8 +66,7 @@ void reactionMatchBatch(ReactionBatch* batch, int query, const char *mode) {
             batch->poutput[i] = NPY_TRUE;
         else
             batch->poutput[i] = NPY_FALSE;
-//        debug info
-//        printf("[%i %i]:\n in =  %s\n out = %i\n", batch->threadid, i, batch->pinput[i], batch->poutput[i]);
+        //  printf("[%i %i]:\n in =  %s\n out = %i\n", batch->threadid, i, batch->pinput[i], batch->poutput[i]);
         indigoFree(rxn);
         indigoFree(matcher);
         indigoFree(match);
@@ -91,7 +86,7 @@ void reactionMatchLin(char **in_data, npy_bool *out_data, int size, char *queryS
 
     qword query = indigoLoadReactionSmartsFromString(querySmarts);
     if (query == -1) {
-        printf("Invalid SMARTS: %s", querySmarts);
+        printf("Invalid reaction SMARTS: %s", querySmarts);
         return;
     }
     indigoOptimize(query, NULL);
@@ -167,7 +162,7 @@ reactionMatchNumPy(PyArrayObject *np_input, char *querySmarts, char *aamMode, in
 
 
     // check query SMARTS
-    if (checkQuerySmarts(querySmarts, options->sid) == -1) {
+    if (checkReactionSmarts(querySmarts, options->sid) == -1) {
         return NULL;
     };
 

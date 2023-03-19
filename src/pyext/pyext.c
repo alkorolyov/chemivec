@@ -268,6 +268,8 @@ PyObject* _get_option(PyObject* self, PyObject* args) {
 
 }
 
+
+
 PyObject* _rxn_match(PyObject* self, PyObject* args, PyObject* kwargs) {
     static char* keywords[] = {"np_input", "query_smarts", "aam_mode", "num_cores", NULL};
 
@@ -285,12 +287,30 @@ PyObject* _rxn_match(PyObject* self, PyObject* args, PyObject* kwargs) {
 }
 
 
+PyObject* _rxn_smarts_isok(PyObject* self, PyObject* args) {
+    char* smarts;
+    if (!PyArg_ParseTuple(args, "s", &smarts)) {
+        return NULL;
+    }
+
+    indigoSetSessionId(options->sid);
+    qword query = indigoLoadReactionSmartsFromString(smarts);
+
+    if (query == -1) {
+        return Py_False;
+    }
+
+    indigoFree(query);
+    return Py_True;
+}
+
 
 // Define the module methods
 static PyMethodDef methods[] = {
         {"_rxn_match", (PyCFunction) _rxn_match, METH_VARARGS | METH_KEYWORDS, "C-API vecorized reaction match"},
-        {"_set_option", (PyCFunction) _set_option, METH_VARARGS, "Set option"},
-        {"_get_option", (PyCFunction) _get_option, METH_VARARGS, "Get option"},
+        {"_rxn_smarts_isok", (PyCFunction) _rxn_smarts_isok, METH_VARARGS, "Check reaction SMARTS"},
+        {"_set_option", (PyCFunction) _set_option, METH_VARARGS,           "Set option"},
+        {"_get_option", (PyCFunction) _get_option, METH_VARARGS,           "Get option"},
         {NULL, NULL, 0, NULL}   // Sentinel value to indicate end of list
 };
 

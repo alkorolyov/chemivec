@@ -16,7 +16,7 @@ def _set_str_option(name: str, value: str):
     _set_option(name, value)
 
 
-def _check_num_cores(value: int) -> str:
+def _process_num_cores(value: int) -> str:
     if isinstance(value, float):
         raise TypeError(f"float type not allowed, int or string expected")
     value = int(value)
@@ -25,8 +25,6 @@ def _check_num_cores(value: int) -> str:
     elif value == 0 or value > mp.cpu_count():
         value = mp.cpu_count()
     return str(value)
-
-
 
 def set_option(name: str, value: Union[str, int]):
     """
@@ -40,15 +38,16 @@ def set_option(name: str, value: Union[str, int]):
 
     # num_cores
     if name == "num_cores":
-        value = _check_num_cores(value)
-        _set_option(name, value)
+        value = _process_num_cores(value)
+
+    _set_option(name, value)
 
 
 def get_option(name: str):
     """
     Get global option from Chemivec module by name
-    :param name: option name
-    :return:
+    :param name: (str) option name
+    :return: option value
     """
     if not name in SUPPORTED_OPTIONS:
         raise ValueError(f"Option `{name}` not supported, must be one of : {SUPPORTED_OPTIONS.keys()}")

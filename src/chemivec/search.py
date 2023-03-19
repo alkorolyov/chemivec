@@ -3,8 +3,8 @@ import numpy as np
 import pandas as pd
 import multiprocessing as mp
 
-from ._chemivec import _rxn_match
-from .options import get_option, set_option, _check_num_cores
+from ._chemivec import _rxn_match, _rxn_smarts_isok
+from .options import get_option, set_option, _process_num_cores
 
 def _convert_to_numpy(arr: Union[np.ndarray, pd.DataFrame, pd.Series, list]) -> np.ndarray:
     # Check the array type and convert everything to numpy
@@ -25,45 +25,48 @@ def _convert_to_numpy(arr: Union[np.ndarray, pd.DataFrame, pd.Series, list]) -> 
     return arr
 
 
-def rxn_match(arr: Union[np.ndarray, pd.DataFrame, pd.Series, list],
-              query_smarts: str = None,
-              aam_mode: str = "DAYLIGHT-AAM",
-              num_cores: Union[int, None] = None) -> np.ndarray:
+def rxn_subsearch(arr: Union[np.ndarray, pd.DataFrame, pd.Series, list],
+                  query_smarts: str = None,
+                  aam_mode: str = "DAYLIGHT-AAM",
+                  num_cores: Union[int, None] = None) -> np.ndarray:
     """
     Vectorized reaction substructure search. Input SMILES array and query SMARTS. Both should
-    be reactions, e.g. contains ">>" sign. By default uses daylight atom-to-atom mapping rules:
+    be reactions, e.g. contains ">>" sign. By default, uses daylight atom-to-atom mapping rules:
     https://www.daylight.com/dayhtml/doc/theory/theory.smarts.html (Section 4.6 Reaction Queries)
-    If no atom mapping found in query - atom mappings are ignored
+    If no atom mapping found in query - atom mappings are ignored. By default, uses all available cores
+    for parallel computation. This number can be set globally `chemivec.set_option('num_cores', 12)`
+
     Example:
-        rxn_match([ '[C:1]=O>>[C:1]O', 'C=O>>CO' ],
+        rxn_subsearch([ '[C:1]=O>>[C:1]O', 'C=O>>CO' ],
                   query_smarts = '[C:1]=O>>[C:1]O'
                   )
         output: array([ True, False])
 
-        rxn_match([ '[C:1]=O>>[C:1]O', 'C=O>>CO' ],
+        rxn_subsearch([ '[C:1]=O>>[C:1]O', 'C=O>>CO' ],
                   query_smarts='C=O>>CO'
                   )
         output: array([ True, True])
 
-    :param num_cores:
     :param arr: input array of reaction SMILES, supported inputs: np.ndarray, pd.DataFrame, pd.Series, list
     :param query_smarts: (str) reaction SMARTS
     :param aam_mode: (str) by defaylt "DAYLIGHT-AAM"
+    :param num_cores: (int) number of threads or parallel computation, max by default
     :return: (np.ndarray[bool]) boolean result as numpy array
     """
     # query smarts
     if query_smarts is None or not query_smarts:
         raise ValueError(f"query_smarts could not be empty or None, should be a SMARTS string")
-    # TODO check smarts
+    if not _rxn_smarts_isok(query_smarts):
+        raise ValueError(f"Invalid reaction SMARTS: {query_smarts}")
 
     # num_cores
     if num_cores:
-        num_cores = _check_num_cores(int(num_cores))
+        num_cores = _process_num_cores(num_cores)
     else:
         num_cores = get_option("num_cores")
 
+    # input array
     arr = _convert_to_numpy(arr)
-
     # check item type
     # first check 'np.str_' because it is subclass of 'str'
     if isinstance(arr[0], np.str_):
