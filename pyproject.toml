@@ -13,6 +13,6 @@ build-backend = "setuptools.build_meta"
 [tool.cibuildwheel]
 # Python >= 3.7, skip 32bit
 skip = "cp36-* *-win32 *-manylinux_i686"
-build = "*"
+build = "cp38-*"
 test-requires = "pytest"
 test-command = "pytest {project}/tests"
