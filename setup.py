@@ -16,6 +16,7 @@ setup(
         "cmake>=3.16",
         "pytest",
         "ninja",
-        "numpy"
+        "numpy>=1.7",
+        "pandas"
     ]
 )
