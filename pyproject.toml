@@ -3,10 +3,10 @@ requires = [
 #    "setuptools>=42",
 #    "wheel",
     "scikit-build>=0.13",
-#    "cmake>=3.16",
+    "cmake>=3.16",
 #    "pytest",
 #    "ninja",
-#    "numpy"
+    "numpy"
 ]
 build-backend = "setuptools.build_meta"
 
@@ -19,8 +19,12 @@ test-command = "pytest {project}/tests"
 
 # Install system library
 [tool.cibuildwheel.linux]
+manylinux-x86_64-image = "manylinux_2_24"
+
 # Run multiple commands using an array
 before-all = [
-#    "sudo apt install python3-numpy libcairo2-dev zlib1g-dev libomp-dev -y",
-#    "sudo apt install python3-numpy -y"
+    #    "apt-get python3-numpy libcairo2-dev zlib1g-dev libomp-dev -y",
+    "apt-get update",
+    "apt-get install python3-dev -y",
+    "apt-get install python3-numpy -y"
 ]
