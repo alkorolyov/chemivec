@@ -13,17 +13,10 @@ FetchContent_MakeAvailable(Indigo)
 
 
 
-if(APPLE)
-    execute_process(COMMAND brew install python3)
-elseif(UNIX)
-#        execute_process(COMMAND sudo apt-get install -y python3-dev)
+if(UNIX)
     execute_process(COMMAND yum install -y python3-devel python3-numpy)
-elseif(WIN32)
-    message(FATAL_ERROR "Python3 Development headers and libraries not found")
-endif()
 
 find_package(Python3 REQUIRED Interpreter Development NumPy)
-
 find_package(OpenMP REQUIRED)
 
 # Find all sources
