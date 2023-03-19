@@ -4,7 +4,7 @@ Vectorized Cheminformatics Python library, based on EPAM Indigo toolkit C-API
 and using NumPy for input/output.
 
 ### Supported operations:
-`rxn_match` - reaction substructure match
+`rxn_subsearch` - reaction substructure match
 
     `input`         : reaction SMILES array (numpy, pandas and python list supported)
     `query_smarts`  : reaction query SMARTS
@@ -16,8 +16,8 @@ import chemivec as cv
 import numpy as np
 
 arr = np.array(['[C:1]=O>>[C:1]O', 'C=O>>CO'])
-query = "[C:1]=[O]>>[C:1]-[O]"
-res = cv.rxn_match(arr, query_smarts=query)
+query = "[C:1]=O>>[C:1]O"
+res = cv.rxn_subsearch(arr, query_smarts=query)
 print(res)
 
 # Output: array([ True, False]) 
@@ -31,9 +31,9 @@ Number of cores can be specified as a global option or passed as a parameter.
 ```python
 import chemivec as cv
 
-cv.rxn_match(arr, query_smarts=query)   # default max available cores
+cv.rxn_subsearch(arr, query_smarts=query)   # default max available cores
 cv.set_option("num_cores", 12)          # change defaults
-cv.rxn_match(arr, query_smarts=query, num_cores=8)
+cv.rxn_subsearch(arr, query_smarts=query, num_cores=8)
 ```
 
 `Atom-to-atom matching` follows the standard DAYLIGHT SMARTS rules
