@@ -16,3 +16,11 @@ skip = "cp36-* *-win32 *-manylinux_i686"
 build = "cp38-*"
 test-requires = "pytest"
 test-command = "pytest {project}/tests"
+
+# Install system library
+[tool.cibuildwheel.linux]
+# Run multiple commands using an array
+before-all = [
+#    "sudo apt install python3-numpy libcairo2-dev zlib1g-dev libomp-dev -y",
+    "sudo apt install python3-numpy -y"
+]
