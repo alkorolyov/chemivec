@@ -10,7 +10,12 @@ setup(
     # cmake_install_target="_chemivec",
     python_requires=">=3.7",
     install_requires=[
-        "numpy>=1.7",
-        "pandas"
+        "setuptools>=42",
+        "wheel",
+        "scikit-build>=0.13",
+        "cmake>=3.16",
+        "pytest",
+        "ninja",
+        "numpy"
     ]
 )
