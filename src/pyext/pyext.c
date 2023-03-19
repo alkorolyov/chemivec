@@ -262,7 +262,7 @@ PyObject* _get_option(PyObject* self, PyObject* args) {
 //        Py_DecRef(value);
         return value;
     } else {
-        printf("Option %s not found\n");
+        printf("Option %s not found\n", option_name);
         return NULL;
     }
 
@@ -273,7 +273,7 @@ PyObject* _get_option(PyObject* self, PyObject* args) {
 PyObject* _rxn_match(PyObject* self, PyObject* args, PyObject* kwargs) {
     static char* keywords[] = {"np_input", "query_smarts", "aam_mode", "num_cores", NULL};
 
-    PyArrayObject* np_input;
+    PyObject* np_input;
     char* querySmarts;
     char* aamMode;
     int numCores;

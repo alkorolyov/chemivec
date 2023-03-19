@@ -4,6 +4,10 @@
 
 
 #define NO_IMPORT_ARRAY // NumPy C-API is already imported
+#define PY_ARRAY_UNIQUE_SYMBOL CHEMIVEC_ARRAY_API
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#include "numpy/arrayobject.h"
+
 #include "core.h"
 
 PyArrayObject *cstr2numpy(char **strings, int size) {
@@ -152,8 +156,8 @@ void reactionMatchVec(char **in_data, npy_bool *out_data, int size, char *queryS
 }
 
 
-PyArrayObject *
-reactionMatchNumPy(PyArrayObject *np_input, char *querySmarts, char *aamMode, int numCores, ChemivecOptions *options) {
+PyObject *
+reactionMatchNumPy(PyObject *np_input, char *querySmarts, char *aamMode, int numCores, ChemivecOptions *options) {
 //    if (checkQuerySmarts(querySmarts) == -1) {
 //        return NULL;
 //    }
@@ -167,9 +171,9 @@ reactionMatchNumPy(PyArrayObject *np_input, char *querySmarts, char *aamMode, in
     };
 
 
-    int size = PyArray_SIZE(np_input);
+    int size = PyArray_SIZE((PyArrayObject*)np_input);
     npy_intp dims[] = {size};
-    char ** in_data = numpy2cstr(np_input);
+    char ** in_data = numpy2cstr((PyArrayObject*)np_input);
 
     PyArrayObject* np_output = (PyArrayObject*)PyArray_EMPTY(1, dims, NPY_BOOL, NPY_ARRAY_C_CONTIGUOUS);
     npy_bool* out_data = (npy_bool*) PyArray_DATA(np_output); // output boolean array
@@ -179,7 +183,7 @@ reactionMatchNumPy(PyArrayObject *np_input, char *querySmarts, char *aamMode, in
 
     PyMem_Free(in_data);
     PyArray_XDECREF(np_output);
-    return np_output;
+    return (PyObject*)np_output;
 }
 
 

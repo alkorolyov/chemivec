@@ -2,17 +2,13 @@
 // Created by ergot on 09/03/2023.
 //
 
-#ifndef CHEMIVEC_VEC_H
-#define CHEMIVEC_VEC_H
-#endif //CHEMIVEC_VEC_H
+#ifndef CHEMIVEC_CORE_H
+#define CHEMIVEC_CORE_H
+#endif //CHEMIVEC_CORE_H
 
 #include "Python.h"
 #include "indigo.h"
 #include <omp.h>
-
-#define PY_ARRAY_UNIQUE_SYMBOL CHEMIVEC_ARRAY_API
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-#include "numpy/arrayobject.h"
 
 typedef struct {
     qword sid;
@@ -39,8 +35,8 @@ void reactionMatchLin(char **in_data, npy_bool *out_data, int size, char *queryS
 
 void reactionMatchVec(char **in_data, npy_bool *out_data, int size, char *querySmarts, const char *mode, int numCores);
 
-PyArrayObject *
-reactionMatchNumPy(PyArrayObject *np_input, char *querySmarts, char *aamMode, int numCores, ChemivecOptions *options);
+PyObject *
+reactionMatchNumPy(PyObject *np_input, char *querySmarts, char *aamMode, int numCores, ChemivecOptions *options);
 
 
 inline static void finishSearch(int rxn, int matcher, int match) {
