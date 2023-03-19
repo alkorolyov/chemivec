@@ -8,7 +8,7 @@
 
 #include "Python.h"
 #include "indigo.h"
-#include <omp.h>
+#include "omp.h"
 
 typedef struct {
     qword sid;

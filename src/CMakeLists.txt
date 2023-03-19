@@ -13,17 +13,17 @@ endif ()
 
 # Set compiler flags
 find_package(OpenMP REQUIRED)
+string(APPEND CMAKE_C_FLAGS " ${OpenMP_C_FLAGS} $ENV{CFLAGS}")
+string(APPEND CMAKE_CXX_FLAGS " ${OpenMP_CXX_FLAGS} $ENV{CFLAGS}")
 
 if (MINGW)
     # -fwhole breaks the linking
-    string(APPEND CMAKE_C_FLAGS " -static ${OpenMP_C_FLAGS} $ENV{CFLAGS}")
-    string(APPEND CMAKE_CXX_FLAGS " -static ${OpenMP_CXX_FLAGS} $ENV{CXXFLAGS}")
+    string(APPEND CMAKE_C_FLAGS " -static $ENV{CFLAGS}")
+    string(APPEND CMAKE_CXX_FLAGS " -static $ENV{CXXFLAGS}")
 
     set(CMAKE_C_FLAGS_RELEASE " -O3 -ffast-math -DNDEBUG")
     set(CMAKE_CXX_FLAGS_RELEASE " -O3 -ffast-math -DNDEBUG")
 elseif(MSVC)
-    string(APPEND CMAKE_C_FLAGS " ${OpenMP_C_FLAGS} $ENV{CFLAGS}")
-    string(APPEND CMAKE_CXX_FLAGS " ${OpenMP_CXX_FLAGS} $ENV{CFLAGS}")
     string(APPEND CMAKE_C_FLAGS " -MP -D_CRT_SECURE_NO_WARNINGS -D_WIN32_WINNT=0x0601 -DWINVER=0x0601")
     string(APPEND CMAKE_CXX_FLAGS " -MP -EHs -D_CRT_SECURE_NO_WARNINGS -D_WIN32_WINNT=0x0601 -DWINVER=0x0601")
 
