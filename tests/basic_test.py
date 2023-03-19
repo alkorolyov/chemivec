@@ -10,7 +10,7 @@ import multiprocessing as mp
 try:
     # skbuild
     # package available through pip install
-    from chemivec import rxn_match, set_option, get_option
+    from chemivec import rxn_subsearch, set_option, get_option
 except ModuleNotFoundError:
     # clion build
     # run command `pytest ./tests` from root project folder
