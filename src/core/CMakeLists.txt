@@ -10,7 +10,19 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Indigo)
 
 # Python, Numpy, OpenMP
+
 find_package(Python3 REQUIRED Interpreter Development NumPy)
+if(NOT Python3_Development_FOUND)
+    if(APPLE)
+        execute_process(COMMAND brew install python3)
+    elseif(UNIX)
+#        execute_process(COMMAND sudo apt-get install -y python3-dev)
+        execute_process(COMMAND yum install -y python3-devel)
+    elseif(WIN32)
+        message(FATAL_ERROR "Python3 Development headers and libraries not found")
+    endif()
+endif()
+
 find_package(OpenMP REQUIRED)
 
 # Find all sources
