@@ -1,12 +1,12 @@
 [build-system]
 requires = [
-    "setuptools>=42",
-    "wheel",
+#    "setuptools>=42",
+#    "wheel",
     "scikit-build>=0.13",
-    "cmake>=3.16",
-    "pytest",
-    "ninja",
-    "numpy"
+#    "cmake>=3.16",
+#    "pytest",
+#    "ninja",
+#    "numpy"
 ]
 build-backend = "setuptools.build_meta"
 
@@ -22,5 +22,5 @@ test-command = "pytest {project}/tests"
 # Run multiple commands using an array
 before-all = [
 #    "sudo apt install python3-numpy libcairo2-dev zlib1g-dev libomp-dev -y",
-    "sudo apt install python3-numpy -y"
+#    "sudo apt install python3-numpy -y"
 ]
