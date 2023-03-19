@@ -10,13 +10,15 @@ import multiprocessing as mp
 try:
     # skbuild
     # package available through pip install
-    from chemivec import rxn_match, set_option, get_option
+    from chemivec import rxn_subsearch, set_option, get_option
 except ModuleNotFoundError:
     # clion build
     # run command `pytest ./tests` from root project folder
     sys.path.append(os.getcwd())
     from src.chemivec import rxn_subsearch, set_option, get_option
 
+
+MAX_CPU_COUNT = mp.cpu_count()
 
 def test_numpy_npstr():
     arr = np.array(['[C:1]=O>>[C:1]O', 'C=O>>CO'])
@@ -109,12 +111,15 @@ def test_no_aam_query():
 
 
 def test_get_default_num_cores():
-    assert get_option("num_cores") == mp.cpu_count()
+    assert get_option("num_cores") == MAX_CPU_COUNT
 
+def test_set_option_num_cores_str():
+    set_option("num_cores", "1")
+    assert get_option("num_cores") == 1
 
 def test_set_option_num_cores_int():
-    set_option("num_cores", 10)
-    assert get_option("num_cores") == 10
+    set_option("num_cores", MAX_CPU_COUNT // 2)
+    assert get_option("num_cores") == MAX_CPU_COUNT // 2
 
 def test_set_float_num_cores():
     with pytest.raises(TypeError, match="float type not allowed, int or string expected"):
@@ -132,18 +137,13 @@ def test_set_bad_str_num_cores():
         set_option("num_cores", "1a")
 
 
-def test_set_option_num_cores_str():
-    set_option("num_cores", "12")
-    assert get_option("num_cores") == 12
-
-
 def test_set_zero_num_cores():
     set_option("num_cores", 0)
-    assert get_option("num_cores") == mp.cpu_count()
+    assert get_option("num_cores") == MAX_CPU_COUNT
 
 def test_set_big_num_cores():
-    set_option("num_cores", mp.cpu_count() * 2)
-    assert get_option("num_cores") == mp.cpu_count()
+    set_option("num_cores", MAX_CPU_COUNT * 2)
+    assert get_option("num_cores") == MAX_CPU_COUNT
 
 
 
