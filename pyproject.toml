@@ -1,13 +1,39 @@
+[project]
+name="chemivec"
+version="0.1.0"
+requires-python = ">=3.8"
+dependencies = [
+    'numpy>=1.7',
+    'pandas'
+]
+
 [build-system]
 requires = [
-    "setuptools>=42",
-    "scikit-build>=0.13",
-    "wheel",
-    "cmake>=3.16",
-    "ninja",
-    "numpy"
+    "scikit-build-core",
+    "numpy>=1.7"
 ]
-build-backend = "setuptools.build_meta"
+requires-python = ">=3.8"
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+cmake.verbose = true
+#cmake.args = ["--target _chemivec"]
+wheel.packages = ["src/chemivec"]
+sdist.exclude = ["*unity*"]
+
+build-dir = "build"
+
+# old skbuild
+#[build-system]
+#requires = [
+#    "setuptools>=42",
+#    "scikit-build>=0.13",
+#    "wheel",
+#    "cmake>=3.16",
+#    "ninja",
+#    "numpy"
+#]
+#build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]
 # Python >= 3.7, skip 32bit
@@ -15,12 +41,12 @@ skip = "cp36-* *-win32 *-manylinux_i686"
 build = "cp38-*"
 test-requires = "pytest"
 test-command = "pytest {project}/tests"
-build-verbosity = 3
+build-verbosity = 1
 before-build = [
     #"pip install setuptools",
     #"pip install scikit-build"
 ]
-environment = { CMAKE_ARGS="-DCMAKE_BUILD_TARGET=_chemivec -DCIBUILDWHEEL=1" }
+environment = { CMAKE_ARGS="-DCIBUILDWHEEL=1" }
 
 # Windows
 [tool.cibuildwheel.windows]

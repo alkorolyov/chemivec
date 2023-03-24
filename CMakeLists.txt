@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.16)
 
 project(Chemivec LANGUAGES NONE)
 
-
 # Override Indigo options to install indigo-core only
 set(BUILD_INDIGO_WRAPPERS OFF CACHE STRING "Build all existing Indigo API wrappers" FORCE)
 set(BUILD_INDIGO_UTILS OFF CACHE STRING "Build indigo-cano, indigo-deco and indigo-depict utilities" FORCE)

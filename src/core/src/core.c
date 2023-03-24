@@ -2,7 +2,6 @@
 // Created by ergot on 09/03/2023.
 //
 
-
 #define NO_IMPORT_ARRAY // NumPy C-API is already imported
 
 #include "core.h"
