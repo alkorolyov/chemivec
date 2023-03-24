@@ -2,15 +2,26 @@ cmake_minimum_required(VERSION 3.16)
 project(_chemivec LANGUAGES C CXX)
 
 # Find Python
-find_package(Python REQUIRED Interpreter Development NumPy)
+#include(FindPython3)
+#find_package(Python3 REQUIRED)
 
 # Find all sources
 file(GLOB ${PROJECT_NAME}_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/*.c)
 
-# Main target
-Python_add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
+# Python extension naming
+add_library(${PROJECT_NAME} MODULE ${${PROJECT_NAME}_SOURCES})
 target_link_libraries(${PROJECT_NAME} PRIVATE chemivec-core)
+set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
+
+if(WIN32)
+    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".pyd")
+else()
+    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".so")
+endif()
+
+#Python3_add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
+#target_link_libraries(${PROJECT_NAME} PRIVATE chemivec-core)
 
 if(SKBUILD)
     install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION src/chemivec)

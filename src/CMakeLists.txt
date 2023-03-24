@@ -66,7 +66,8 @@ endif ()
 
 message(STATUS CMAKE_C_FLAGS=${CMAKE_C_FLAGS})
 message(STATUS CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS})
-
+message(STATUS CMAKE_BUILD_TARGET=${CMAKE_BUILD_TARGET})
+message(STATUS CIBUILDWHEEL=${CIBUILDWHEEL})
 
 add_subdirectory(core)
 add_subdirectory(pyext)

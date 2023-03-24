@@ -9,13 +9,14 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Indigo)
 
+include(FindPython3)
 if(WIN32)
     find_package(Python3 REQUIRED Interpreter Development NumPy)
 #    set(Python_INCLUDE_DIRS ${Python3_INCLUDE_DIRS})
 #    set(Python_LIBRARIES ${Python3_LIBRARIES})
 #    set(Python_NumPy_INCLUDE_DIRS ${Python3_NumPy_INCLUDE_DIRS})
-elseif(UNIX and SKBUILD)
-    find_package(Python REQUIRED Interpreter Development NumPy)
+elseif(UNIX AND SKBUILD)
+    find_package(Python3 REQUIRED)
 endif()
 find_package(OpenMP REQUIRED)
 
@@ -30,6 +31,7 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
         PUBLIC ${Python_INCLUDE_DIRS}
         PUBLIC ${Python3_INCLUDE_DIRS}
+	PUBLIC ${Python3_INCLUDE_DIR}
         PUBLIC ${Python_NumPy_INCLUDE_DIRS}
         PUBLIC ${Python3_NumPy_INCLUDE_DIRS}
 #        PUBLIC ${OpenMP_C_INCLUDE_DIRS}
