@@ -1,10 +1,9 @@
 [build-system]
 requires = [
     "setuptools>=42",
-#    "wheel",
     "scikit-build>=0.13",
-#    "cmake>=3.16",
-#    "pytest",
+    "wheel",
+    "cmake>=3.16",
     "ninja",
     "numpy"
 ]
@@ -14,22 +13,23 @@ build-backend = "setuptools.build_meta"
 # Python >= 3.7, skip 32bit
 skip = "cp36-* *-win32 *-manylinux_i686"
 build = "cp38-*"
-#test-requires = "pytest"
-#test-command = "pytest {project}/tests"
+test-requires = "pytest"
+test-command = "pytest {project}/tests"
 build-verbosity = 3
 before-build = [
     #"pip install setuptools",
     #"pip install scikit-build"
-
 ]
-environment = { CMAKE_BUILD_TARGET="_chemivec", CIBUILDWHEEL="1" }
+environment = { CMAKE_ARGS="-DCMAKE_BUILD_TARGET=_chemivec -DCIBUILDWHEEL=1" }
 
+# Windows
+[tool.cibuildwheel.windows]
 
 # Linux
-
 [tool.cibuildwheel.linux]
 manylinux-x86_64-image = "manylinux_2_24"
-environment-pass = ["CMAKE_BUILD_TARGET", "CIBUILDWHEEL"]
+environment-pass = ["CMAKE_ARGS"]
+
 before-all = [
     #"apt-get update",
     #"pip install setuptools"
@@ -37,6 +37,4 @@ before-all = [
     #"apt-get install python3-dev -y",
     #"apt-get install python3-numpy -y",
     #"apt-get install libcairo2-dev -y",
-    #"export CMAKE_BUILD_TARGET=_chemivec",
-    
 ]
