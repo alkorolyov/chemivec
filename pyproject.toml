@@ -10,30 +10,27 @@ dependencies = [
 [build-system]
 requires = [
     "scikit-build-core",
-    "numpy>=1.7"
+    "numpy>=1.7",
 ]
 requires-python = ">=3.8"
 build-backend = "scikit_build_core.build"
 
 [tool.scikit-build]
-cmake.verbose = true
-#cmake.args = ["--target _chemivec"]
-wheel.packages = ["src/chemivec"]
-sdist.exclude = ["*unity*"]
+#cmake.verbose = false
+#logging.level = "INFO"
 
-build-dir = "build"
+#cmake.minimum-version = "3.16"
+#ninja.minimum-version = "1.7"
+#ninja.make-fallback = false
 
-# old skbuild
-#[build-system]
-#requires = [
-#    "setuptools>=42",
-#    "scikit-build>=0.13",
-#    "wheel",
-#    "cmake>=3.16",
-#    "ninja",
-#    "numpy"
-#]
-#build-backend = "setuptools.build_meta"
+#wheel.packages = ["src/chemivec"]
+#sdist.exclude = ["*unity*"]
+
+
+[tool.scikit-build.cmake.define]
+CMAKE_GENERATOR  = "Ninja"
+
+#build-dir = "build"
 
 [tool.cibuildwheel]
 # Python >= 3.7, skip 32bit
@@ -43,8 +40,6 @@ test-requires = "pytest"
 test-command = "pytest {project}/tests"
 build-verbosity = 1
 before-build = [
-    #"pip install setuptools",
-    #"pip install scikit-build"
 ]
 environment = { CMAKE_ARGS="-DCIBUILDWHEEL=1" }
 
@@ -57,10 +52,7 @@ manylinux-x86_64-image = "manylinux_2_24"
 environment-pass = ["CMAKE_ARGS"]
 
 before-all = [
-    #"apt-get update",
-    #"pip install setuptools"
-    #"pip install scikit-build"
-    #"apt-get install python3-dev -y",
-    #"apt-get install python3-numpy -y",
-    #"apt-get install libcairo2-dev -y",
+    "apt-get update",
+    "apt-get install libcairo2-dev -y",
+    "apt-get install zlib1g-dev -y"
 ]
