@@ -23,7 +23,7 @@ Python3_add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
 target_link_libraries(${PROJECT_NAME} PRIVATE chemivec-core)
 
 if(SKBUILD)
-    #install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION src/chemivec)
+    install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/src/chemivec)
     set_target_properties (${PROJECT_NAME} PROPERTIES
             LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/src/chemivec
             )
