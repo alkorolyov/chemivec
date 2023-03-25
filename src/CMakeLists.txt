@@ -69,6 +69,10 @@ message(STATUS CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS})
 message(STATUS CIBUILDWHEEL=${CIBUILDWHEEL})
 message(STATUS CMAKE_GENERATOR=${CMAKE_GENERATOR})
 
+if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
+    set(CMAKE_GENERATOR Ninja)
+endif()
+
 add_subdirectory(core)
 add_subdirectory(pyext)
 
