@@ -67,10 +67,11 @@ endif ()
 message(STATUS CMAKE_C_FLAGS=${CMAKE_C_FLAGS})
 message(STATUS CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS})
 message(STATUS CIBUILDWHEEL=${CIBUILDWHEEL})
+message(STATUS CMAKE_GENERATOR=${CMAKE_GENERATOR})
 
 add_subdirectory(core)
 add_subdirectory(pyext)
 
 if(TEST_CHEMIVEC)
-    add_subdirectory(tests)
+    add_subdirectory(tests EXCLUDE_FROM_ALL)
 endif()
