@@ -105,3 +105,29 @@ To check dependencies of your `*.pyd` library
 dumpbin should be run from developer command prompt of VS 2022
 
 `dumpbin mylib_c_ext.pyd /DEPENDENTS`
+
+
+### To build from sources
+
+sudo apt install build-essential ninja-build mc wget git libcairo2-dev zlib1g-dev -y
+git clone https://github.com/alkorolyov/chemivec
+
+wget https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh;chmod +x Mambaforge-Linux-x86_64.sh;bash Mambaforge-Linux-x86_64.sh;export MAMBA_NO_BANNER=1
+# if conda still not seen then ~/.bashrc is not sourced when you log in using SSH.
+# You need to source it in your ~/.bash_profile like this:
+echo "if [ -f ~/.bashrc ]; then
+. ~/.bashrc
+fi" >> ~/.bash_profile
+# restart shell
+conda config --set auto_activate_base false
+mamba create -n dev
+mamba activate dev
+mamba install pip pytest -y
+pip install .
+
+# (optional) to build in cibuildwheel
+pip intall cibuildwheel
+sudo apt-get install docker.io; sudo groupadd docker; sudo usermod -aG docker $USER
+sudo reboot now
+cibuildwheel --platform linux
+
