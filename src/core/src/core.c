@@ -3,11 +3,11 @@
 //
 
 #define NO_IMPORT_ARRAY // NumPy C-API is already imported
-
 #include "core.h"
 
 PyArrayObject *cstr2numpy(char **strings, int size) {
     npy_intp dims[] = {size};
+
 
     // create empty 1D numpy array of python objects
     PyArrayObject* arr = (PyArrayObject*)PyArray_EMPTY(1, dims, NPY_OBJECT, NPY_ARRAY_C_CONTIGUOUS);

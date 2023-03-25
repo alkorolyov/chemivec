@@ -11,6 +11,5 @@ set(WITH_STATIC ON CACHE STRING "Build Indigo static library as well as shared" 
 set(ENABLE_TESTS OFF CACHE STRING "Enable Indigo CTest tests" FORCE)
 
 # Tests
-
 set(TEST_CHEMIVEC ON CACHE STRING "Enable Chemivec CTest tests")
 add_subdirectory(src)
