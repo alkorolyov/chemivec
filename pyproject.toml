@@ -43,6 +43,7 @@ environment = { CMAKE_ARGS="-DCIBUILDWHEEL=1", CMAKE_GENERATOR="Ninja" }
 
 [tool.cibuildwheel.windows.environment]
 #CMAKE_ARGS="-D CMAKE_C_COMPILER=C:/Users/ergot/mingw64/bin/gcc.exe -D CMAKE_CXX_COMPILER=C:/Users/ergot/mingw64/bin/g++.exe"
+CMAKE_ARGS="-D CMAKE_C_COMPILER=cc.exe -D CMAKE_CXX_COMPILER=c++.exe"
 #CMAKE_GENERATOR="Ninja"
 
 # Linux
