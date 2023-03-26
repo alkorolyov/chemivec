@@ -131,3 +131,13 @@ sudo apt-get install docker.io; sudo groupadd docker; sudo usermod -aG docker $U
 sudo reboot now
 cibuildwheel --platform linux
 
+
+# mingw64 on windows
+# download stable mingw64 release, extract and add to %Path%
+https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-10.0.0-msvcrt-r1/winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64msvcrt-10.0.0-r1.zip
+# download ninja and also add to %Path%
+https://github.com/ninja-build/ninja/releases/download/v1.11.1/ninja-win.zip
+cmake -B build -G "Ninja" -D CMAKE_C_COMPILER=C:/Users/ergot//mingw64/bin/gcc.exe -D CMAKE_CXX_COMPILER=C:/Users/ergot//mingw64/bin/g++.exe .
+cmake --build build --target _chemivec -j 16
+
+

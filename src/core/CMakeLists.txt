@@ -1,23 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(chemivec-core LANGUAGES C CXX)
 
-# Download Indigo package from git
-include(FetchContent)
-FetchContent_Declare(
-        Indigo
-        GIT_REPOSITORY https://github.com/epam/Indigo.git
-)
-FetchContent_MakeAvailable(Indigo)
-
-#include(FindPython3)
-#    message(STATUS Python3_EXECUTABLE=${Python3_EXECUTABLE})
-#    message(STATUS Python3_INCLUDE_DIRS=${Python3_INCLUDE_DIRS})
-#    message(STATUS Python3_NumPy_INCLUDE_DIRS=${Python3_NumPy_INCLUDE_DIRS})
-#    message(STATUS Python3_LIBRARIES=${Python3_LIBRARIES})
-#    message(STATUS Python3_INCLUDE_DIR=${Python3_INCLUDE_DIR})
 
 find_package(Python3 COMPONENTS Interpreter Development.Module NumPy REQUIRED)
-#find_package(OpenMP REQUIRED)
 
 # Find all sources
 file(GLOB ${PROJECT_NAME}_SOURCES
@@ -31,7 +16,7 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC ${Python3_INCLUDE_DIRS}
         PUBLIC ${Python3_NumPy_INCLUDE_DIRS}
 
-        #        PUBLIC ${Python_INCLUDE_DIRS}
+#        PUBLIC ${Python_INCLUDE_DIRS}
 #	    PUBLIC ${Python3_INCLUDE_DIR}
 #        PUBLIC ${Python_NumPy_INCLUDE_DIRS}
 

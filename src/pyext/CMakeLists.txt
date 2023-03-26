@@ -22,26 +22,17 @@ find_package(Python3 REQUIRED Interpreter Development.Module)
 Python3_add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
 target_link_libraries(${PROJECT_NAME} PRIVATE chemivec-core)
 
-if(SKBUILD)
-    install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/src/chemivec)
-    set_target_properties (${PROJECT_NAME} PROPERTIES
-            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/src/chemivec
-            )
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/src/chemivec)
+set_target_properties (${PROJECT_NAME} PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/src/chemivec
+        )
 
-# Clion CMake build
-else()
-    set_target_properties (${PROJECT_NAME} PROPERTIES
-            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/src/chemivec
-            )
-    # Run pytest after build
-    if (TEST_CHEMIVEC)
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                COMMAND pytest ./tests -v)
-    endif()
+# Run pytest after build
+if (NOT CIBUILDWHEELS)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            COMMAND pytest ./tests -v)
 endif()
-
-
 
 
 
