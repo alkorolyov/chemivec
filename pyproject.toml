@@ -32,23 +32,23 @@ test-command = "pytest {project}/tests"
 build-verbosity = 1
 before-build = [
 ]
-environment = { CMAKE_ARGS="-DCIBUILDWHEEL=1" }
+environment = { CMAKE_ARGS="-DCIBUILDWHEEL=1", CMAKE_GENERATOR="Ninja" }
 
 # Windows
 [tool.cibuildwheel.windows]
-before-all = [
-    "curl https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-10.0.0-msvcrt-r1/winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64msvcrt-10.0.0-r1.zip -L --output mingw.zip",
-    "Expand-Archive mingw.zip ."
-]
+#before-all = [
+#    "curl https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-10.0.0-msvcrt-r1/winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64msvcrt-10.0.0-r1.zip -L --output mingw.zip",
+#    "Expand-Archive mingw.zip ."
+#]
 
 [tool.cibuildwheel.windows.environment]
-CMAKE_ARGS="-D CMAKE_C_COMPILER=C:/Users/ergot/mingw64/bin/gcc.exe -D CMAKE_CXX_COMPILER=C:/Users/ergot/mingw64/bin/g++.exe"
-CMAKE_GENERATOR="Ninja"
+#CMAKE_ARGS="-D CMAKE_C_COMPILER=C:/Users/ergot/mingw64/bin/gcc.exe -D CMAKE_CXX_COMPILER=C:/Users/ergot/mingw64/bin/g++.exe"
+#CMAKE_GENERATOR="Ninja"
 
 # Linux
 [tool.cibuildwheel.linux]
 manylinux-x86_64-image = "manylinux_2_24"
-environment = { CMAKE_GENERATOR="Ninja" }
+#environment = { CMAKE_GENERATOR="Ninja" }
 environment-pass = ["CMAKE_ARGS", "CMAKE_GENERATOR"]
 before-all = [
     "apt-get update",
