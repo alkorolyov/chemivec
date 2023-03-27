@@ -30,7 +30,6 @@ build-verbosity = 1
 
 # Windows
 [tool.cibuildwheel.windows]
-archs = ["AMD64", "x86"]
 
 [tool.cibuildwheel.windows.environment]
 CMAKE_ARGS="-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++"
