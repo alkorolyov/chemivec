@@ -37,7 +37,6 @@ CMAKE_GENERATOR="Ninja"
 
 # Linux
 [tool.cibuildwheel.linux]
-archs = ["x86_64", "aarch64"]
 environment-pass = ["CMAKE_ARGS", "CMAKE_GENERATOR", "CIBUILDWHEEL"]
 repair-wheel-command = ""
 before-build = [

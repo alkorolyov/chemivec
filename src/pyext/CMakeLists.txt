@@ -24,7 +24,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE chemivec-core)
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/src/chemivec)
 
 # Run pytest after build
-if (NOT $ENV{CIBUILDWHEELS})
+if (NOT DEFINED $ENV{CIBUILDWHEELS})
     set_target_properties (${PROJECT_NAME} PROPERTIES
             LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/src/chemivec
             )
