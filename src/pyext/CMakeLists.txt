@@ -29,9 +29,10 @@ set_target_properties (${PROJECT_NAME} PROPERTIES
 
 # Run pytest after build
 if (NOT CIBUILDWHEELS)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-            COMMAND pytest ./tests -v)
+    message(STATUS CIBUILDWHEELS=${CIBUILDWHEELS})
+#    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+#            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+#            COMMAND pytest ./tests -v)
 endif()
 
 

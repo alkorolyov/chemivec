@@ -10,11 +10,21 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Indigo)
 
 # Compile flags
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif ()
+
 find_package(OpenMP REQUIRED)
 string(APPEND CMAKE_C_FLAGS " ${OpenMP_C_FLAGS}")
 string(APPEND CMAKE_CXX_FLAGS " ${OpenMP_CXX_FLAGS}")
 
-if (MINGW)
+if (UNIX AND CMAKE_CXX_COMPILER_ID STREQUAL GNU)
+    string(APPEND CMAKE_C_FLAGS " -static-libstdc++ -static-libgcc -lgomp")
+    string(APPEND CMAKE_CXX_FLAGS " -static-libstdc++ -static-libgcc -lgomp")
+endif()
+
+if (MINGW AND WIN32)
     string(APPEND CMAKE_CXX_FLAGS " -static -Wl,-s")
 endif()
 
