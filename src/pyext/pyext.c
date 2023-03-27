@@ -20,7 +20,7 @@ static int initOptions(qword SessionId) {
         return -1;
     }
     options->sid = SessionId;
-    options->num_cores = omp_get_max_threads();
+    options->n_jobs = omp_get_max_threads();
     return 0;
 }
 
@@ -234,9 +234,9 @@ PyObject* _set_option(PyObject* self, PyObject* args) {
         return NULL;
     }
 
-    if (strcmp(option_name, "num_cores") == 0) {
-        options->num_cores = atoi(option_value);
-//        printf("set num_cores: %d\n", options->num_cores);
+    if (strcmp(option_name, "n_jobs") == 0) {
+        options->n_jobs = atoi(option_value);
+//        printf("set n_jobs: %d\n", options->n_jobs);
         return Py_None;
     } else {
         printf("Option %s not allowed\n", option_name);
@@ -256,9 +256,9 @@ PyObject* _get_option(PyObject* self, PyObject* args) {
         return NULL;
     }
 
-    if (strcmp(option_name, "num_cores") == 0) {
-//        printf("get num_cores: %d\n", options->num_cores);
-        PyObject* value = PyUnicode_FromFormat("%d", options->num_cores);
+    if (strcmp(option_name, "n_jobs") == 0) {
+//        printf("get n_jobs: %d\n", options->n_jobs);
+        PyObject* value = PyUnicode_FromFormat("%d", options->n_jobs);
 //        Py_DecRef(value);
         return value;
     } else {
@@ -271,7 +271,7 @@ PyObject* _get_option(PyObject* self, PyObject* args) {
 
 
 PyObject* _rxn_match(PyObject* self, PyObject* args, PyObject* kwargs) {
-    static char* keywords[] = {"np_input", "query_smarts", "aam_mode", "num_cores", NULL};
+    static char* keywords[] = {"np_input", "query_smarts", "aam_mode", "n_jobs", NULL};
 
     PyObject* np_input;
     char* querySmarts;

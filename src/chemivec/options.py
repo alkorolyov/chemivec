@@ -7,7 +7,7 @@ import re
 from ._chemivec import _set_option, _get_option
 
 SUPPORTED_OPTIONS = {
-    "num_cores": int
+    "n_jobs": int
 }
 
 def _set_str_option(name: str, value: str):
@@ -16,12 +16,12 @@ def _set_str_option(name: str, value: str):
     _set_option(name, value)
 
 
-def _process_num_cores(value: int) -> str:
+def _process_n_jobs(value: int) -> str:
     if isinstance(value, float):
         raise TypeError(f"float type not allowed, int or string expected")
     value = int(value)
     if value < 0:
-        raise ValueError(f"Negative 'num_cores' not allowed")
+        raise ValueError(f"Negative 'n_jobs' not allowed")
     elif value == 0 or value > mp.cpu_count():
         value = mp.cpu_count()
     return str(value)
@@ -36,9 +36,9 @@ def set_option(name: str, value: Union[str, int]):
     if not name in SUPPORTED_OPTIONS:
         raise ValueError(f"Option `{name}` not supported, must be one of : {SUPPORTED_OPTIONS.keys()}")
 
-    # num_cores
-    if name == "num_cores":
-        value = _process_num_cores(value)
+    # n_jobs
+    if name == "n_jobs":
+        value = _process_n_jobs(value)
 
     _set_option(name, value)
 

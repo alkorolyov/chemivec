@@ -26,6 +26,7 @@ def test_numpy_npstr():
     res = rxn_subsearch(arr, query_smarts=query)
     assert res[0]
     assert not res[1]
+    assert res.dtype == np.bool_
 
 
 def test_numpy_pystr():
@@ -72,7 +73,7 @@ def test_empty_array():
     query = "[C:1]=O>>[C:1]O"
     res = rxn_subsearch(arr, query_smarts=query)
     assert res.shape[0] == 0
-    assert res.dtype == np.bool
+    assert res.dtype == np.bool_
 
 
 def test_bad_reaction_smiles():
@@ -121,40 +122,40 @@ def test_no_aam_query():
     assert res[4]
 
 
-def test_get_default_num_cores():
-    assert get_option("num_cores") == MAX_CPU_COUNT
+def test_get_default_n_jobs():
+    assert get_option("n_jobs") == MAX_CPU_COUNT
 
-def test_set_option_num_cores_str():
-    set_option("num_cores", "1")
-    assert get_option("num_cores") == 1
+def test_set_option_n_jobs_str():
+    set_option("n_jobs", "1")
+    assert get_option("n_jobs") == 1
 
-def test_set_option_num_cores_int():
-    set_option("num_cores", MAX_CPU_COUNT // 2)
-    assert get_option("num_cores") == MAX_CPU_COUNT // 2
+def test_set_option_n_jobs_int():
+    set_option("n_jobs", MAX_CPU_COUNT // 2)
+    assert get_option("n_jobs") == MAX_CPU_COUNT // 2
 
-def test_set_float_num_cores():
+def test_set_float_n_jobs():
     with pytest.raises(TypeError, match="float type not allowed, int or string expected"):
-        set_option("num_cores", 1.1)
+        set_option("n_jobs", 1.1)
 
 
-def test_set_negative_num_cores():
-    with pytest.raises(ValueError, match="Negative 'num_cores' not allowed"):
-        set_option("num_cores", -1)
+def test_set_negative_n_jobs():
+    with pytest.raises(ValueError, match="Negative 'n_jobs' not allowed"):
+        set_option("n_jobs", -1)
 
-def test_set_bad_str_num_cores():
+def test_set_bad_str_n_jobs():
     with pytest.raises(ValueError):
-        set_option("num_cores", "1.1")
+        set_option("n_jobs", "1.1")
     with pytest.raises(ValueError):
-        set_option("num_cores", "1a")
+        set_option("n_jobs", "1a")
 
 
-def test_set_zero_num_cores():
-    set_option("num_cores", 0)
-    assert get_option("num_cores") == MAX_CPU_COUNT
+def test_set_zero_n_jobs():
+    set_option("n_jobs", 0)
+    assert get_option("n_jobs") == MAX_CPU_COUNT
 
-def test_set_big_num_cores():
-    set_option("num_cores", MAX_CPU_COUNT * 2)
-    assert get_option("num_cores") == MAX_CPU_COUNT
+def test_set_big_n_jobs():
+    set_option("n_jobs", MAX_CPU_COUNT * 2)
+    assert get_option("n_jobs") == MAX_CPU_COUNT
 
 
 

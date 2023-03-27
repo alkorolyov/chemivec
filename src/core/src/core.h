@@ -17,7 +17,7 @@
 
 typedef struct {
     qword sid;
-    int num_cores;
+    int n_jobs;
 } ChemivecOptions;
 
 typedef struct {

@@ -12,12 +12,12 @@ and using NumPy for input/output.
 ### Example usage:
 
 ```python
-import chemivec as cv
+import chemivec as chem
 import numpy as np
 
 arr = np.array(['[C:1]=O>>[C:1]O', 'C=O>>CO'])
 query = "[C:1]=O>>[C:1]O"
-res = cv.rxn_subsearch(arr, query_smarts=query)
+res = chem.rxn_subsearch(arr, query_smarts=query)
 print(res)
 
 # Output: array([ True, False]) 
@@ -29,11 +29,11 @@ Multithreading realized by OpenMP library. By default, tries to use maximum avai
 Number of cores can be specified as a global option or passed as a parameter.
 
 ```python
-import chemivec as cv
+import chemivec as chem
 
-cv.rxn_subsearch(arr, query_smarts=query)   # default max available cores
-cv.set_option("num_cores", 12)          # change defaults
-cv.rxn_subsearch(arr, query_smarts=query, num_cores=8)
+chem.rxn_subsearch(arr, query_smarts=query)   # default max available cores
+chem.set_option("n_jobs", 12)          # change defaults
+chem.rxn_subsearch(arr, query_smarts=query, n_jobs=8)
 ```
 
 `Atom-to-atom matching` follows the standard DAYLIGHT SMARTS rules

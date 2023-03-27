@@ -158,7 +158,7 @@ reactionMatchNumPy(PyObject *np_input, char *querySmarts, char *aamMode, int num
 //        return NULL;
 //    }
 
-    // set num_cores
+    // set n_jobs
 
 
     // check query SMARTS
