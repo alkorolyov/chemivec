@@ -120,9 +120,10 @@ mamba install pip pytest -y
 pip install .
 
 # (optional) to build in cibuildwheel
-pip intall cibuildwheel
-sudo apt-get install docker.io; sudo groupadd docker; sudo usermod -aG docker $USER
+pip install cibuildwheel
+sudo apt-get install docker.io -y; sudo groupadd docker; sudo usermod -aG docker $USER
 sudo reboot now
+cd chemivec
 cibuildwheel --platform linux
 
 
