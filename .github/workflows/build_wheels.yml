@@ -1,9 +1,5 @@
 name: Build
 
-defaults:
-  run:
-    shell: bash
-
 on:
   push
 #  release:
