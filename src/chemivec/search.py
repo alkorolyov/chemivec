@@ -67,6 +67,15 @@ def rxn_subsearch(arr: Union[np.ndarray, pd.DataFrame, pd.Series, list],
 
     # input array
     arr = _convert_to_numpy(arr)
+
+    # check array dims
+    if arr.ndim != 1:
+        raise ValueError(f"Multidimensional input arrays not allowed")
+
+    # empty array
+    if arr.shape[0] == 0:
+        return np.array([], dtype=bool)
+
     # check item type
     # first check 'np.str_' because it is subclass of 'str'
     if isinstance(arr[0], np.str_):

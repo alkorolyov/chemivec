@@ -44,7 +44,7 @@ def test_pylist():
     assert not res[1]
 
 
-def test_pandas_pd():
+def test_pandas_df():
     arr = pd.DataFrame(['[C:1]=O>>[C:1]O', 'C=O>>CO'])
     query = "[C:1]=O>>[C:1]O"
     res = rxn_subsearch(arr, query_smarts=query)
@@ -60,15 +60,26 @@ def test_pandas_series():
     assert not res[1]
 
 
-def test_bad_reaction_smiles(capfd):
+def test_multi_dim():
+    arr = np.array([[1, 2], [2, 3]])
+    query = "[C:1]=O>>[C:1]O"
+    with pytest.raises(ValueError, match="Multidimensional input arrays not allowed"):
+        rxn_subsearch(arr, query_smarts=query)
+
+
+def test_empty_array():
+    arr = np.array([])
+    query = "[C:1]=O>>[C:1]O"
+    res = rxn_subsearch(arr, query_smarts=query)
+    assert res.shape[0] == 0
+    assert res.dtype == np.bool
+
+
+def test_bad_reaction_smiles():
     arr = np.array(['C]>>'])
     query = "C>>"
-
     res = rxn_subsearch(arr, query_smarts=query)
-    captured = capfd.readouterr()
-
     assert not res[0]
-    # assert captured.out == "[23 0] Invalid SMILES: C]>>"
 
 
 def test_bad_query():
