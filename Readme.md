@@ -32,7 +32,7 @@ Number of cores can be specified as a global option or passed as a parameter.
 import chemivec as chem
 
 chem.rxn_subsearch(arr, query_smarts=query)   # default max available cores
-chem.set_option("n_jobs", 12)          # change defaults
+chem.set_option("n_jobs", 12)                 # change defaults
 chem.rxn_subsearch(arr, query_smarts=query, n_jobs=8)
 ```
 
@@ -42,17 +42,11 @@ declared here https://www.daylight.com/dayhtml/doc/theory/theory.smarts.html (Se
 
 ### Install
 
+Download from pip
+
 `pip install chemivec`
 
 ### Build
-
-To build extension:
-
-`python setup.py build_ext`
-
-To build distribution wheel:
-
-`python setup.py bdist_wheel`
 
 To build and install as a pip package:
 
@@ -138,7 +132,7 @@ https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-10.0.0-m
 # download ninja and also add to %Path%
 https://github.com/ninja-build/ninja/releases/download/v1.11.1/ninja-win.zip
 cmake -B build -G "Ninja" .
-cmake -B build -G "Ninja" -D CMAKE_C_COMPILER=C:/Users/ergot//mingw64/bin/gcc.exe -D CMAKE_CXX_COMPILER=C:/Users/ergot//mingw64/bin/g++.exe .
-cmake --build build --target _chemivec -j 16
+cmake -B build -G "Ninja" -D CMAKE_C_COMPILER=gcc.exe -D CMAKE_CXX_COMPILER=g++.exe .
+cmake --build build --target _chemivec
 
 

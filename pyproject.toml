@@ -18,38 +18,38 @@ build-backend = "scikit_build_core.build"
 [tool.scikit-build]
 #cmake.verbose = true
 #logging.level = "INFO"
-#build-dir = "build" #for local `pip install . `
-
-[tool.scikit-build.cmake.define]
-#CMAKE_GENERATOR="Ninja"
+build-dir = "build" #for local `pip install . `
 
 [tool.cibuildwheel]
 # Python >= 3.8, skip 32bit
 skip = "*-win32 *-manylinux_i686"
-build = "cp38-*"
+build = "cp3{8,9,10,11}-*"
 test-requires = "pytest"
 test-command = "pytest {project}/tests"
 build-verbosity = 1
-environment = { CMAKE_ARGS="-DCIBUILDWHEEL=1", CMAKE_GENERATOR="Ninja" }
 
 # Windows
 [tool.cibuildwheel.windows]
-#before-all = [
-#    "curl https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-10.0.0-msvcrt-r1/winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64msvcrt-10.0.0-r1.zip -L --output mingw.zip",
-#    "Expand-Archive mingw.zip ."
-#]
+archs = ["AMD64", "x86"]
 
 [tool.cibuildwheel.windows.environment]
-#CMAKE_ARGS="-D CMAKE_C_COMPILER=C:/Users/ergot/mingw64/bin/gcc.exe -D CMAKE_CXX_COMPILER=C:/Users/ergot/mingw64/bin/g++.exe"
-#CMAKE_ARGS="-D CMAKE_C_COMPILER=C:/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/cc.exe -D CMAKE_CXX_COMPILER=C:/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/c++.exe"
 CMAKE_ARGS="-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++"
 CMAKE_GENERATOR="Ninja"
 
 # Linux
 [tool.cibuildwheel.linux]
-#environment = { CMAKE_GENERATOR="Ninja" }
-environment-pass = ["CMAKE_ARGS", "CMAKE_GENERATOR"]
+archs = ["x86_64", "aarch64"]
+environment-pass = ["CMAKE_ARGS", "CMAKE_GENERATOR", "CIBUILDWHEEL"]
 repair-wheel-command = ""
 before-build = [
     "yum install cairo-devel -y"
 ]
+
+[tool.cibuildwheel.linux.environment]
+CMAKE_ARGS="-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++"
+CMAKE_GENERATOR="Ninja"
+
+# MacOS
+[tool.cibuildwheel.macos]
+archs = ["x86_64", "arm64"]
+
