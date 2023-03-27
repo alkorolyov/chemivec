@@ -21,13 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-#      - name: Set up MinGW
-#        uses: egor-tensin/setup-mingw@v2
-#        with:
-#          platform: x64
-#          version: 11.2.0
-
-      - name: "Setup"
+      - name: Setup
         run: |
           gcc --version
 
