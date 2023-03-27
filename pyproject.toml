@@ -21,12 +21,12 @@ build-backend = "scikit_build_core.build"
 #build-dir = "build" #for local `pip install . `
 
 [tool.scikit-build.cmake.define]
-CMAKE_GENERATOR="Ninja"
+#CMAKE_GENERATOR="Ninja"
 
 [tool.cibuildwheel]
 # Python >= 3.8, skip 32bit
 skip = "*-win32 *-manylinux_i686"
-build = "cp3{8,9,10,11}*"
+build = "cp38-*"
 test-requires = "pytest"
 test-command = "pytest {project}/tests"
 build-verbosity = 1
