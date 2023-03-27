@@ -30,12 +30,12 @@ jobs:
       - name: "Setup"
         run: |
           gcc --version
-          export CC=gcc
-          export CXX=gxx
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.1
         env:
+          CC: gcc
+          CXX: gxx
         #   CIBW_SOME_OPTION: value
         #    ...
         # with:
