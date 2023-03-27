@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-#        os: [ubuntu-20.04, windows-2019]
+#        os: [ubuntu-20.04]
         os: [windows-2022]
 
     steps:
@@ -31,8 +31,8 @@ jobs:
         run: |
           gcc --version
 
-#      - name: Build wheels
-#        uses: pypa/cibuildwheel@v2.12.1
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.12.1
         # env:
         #   CIBW_SOME_OPTION: value
         #    ...
