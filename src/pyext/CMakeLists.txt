@@ -25,7 +25,7 @@ install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/src/chem
 
 # Run pytest after build
 if (NOT $ENV{CIBUILDWHEELS} MATCHES 1)
-    set_target_properties (${PROJECT_NAME} PROPERTIES
+    set_target_properties(${PROJECT_NAME} PROPERTIES
             LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/src/chemivec
             )
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

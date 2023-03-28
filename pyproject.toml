@@ -1,6 +1,7 @@
 [project]
 name="chemivec"
 version="0.1.0"
+readme = "README.md"
 description="Vectorized cheminformatics library leveraging EPAM Indigo Toolkit"
 requires-python = ">=3.8"
 dependencies = [
@@ -24,11 +25,10 @@ build-dir = "build" #for local `pip install . `
 # Minimum supported Python >= 3.8, 
 # Skipping 32bit and muslinux images
 # Using default "manylinux2014" image
-# For python < 3.10 additonal "manylinux2010" source compilated
 
 skip = "*-win32 *_i686 *-musllinux_*" 
 build = "cp3{8,9,10,11}-*"
-test-requires = "pytest"
+test-requires = ["pytest"]
 test-command = "pytest {project}/tests"
 build-verbosity = 1
 
@@ -57,10 +57,6 @@ environment-pass = ["CMAKE_ARGS", "CMAKE_GENERATOR", "CIBUILDWHEEL", "PIP_PREFER
 before-all = [
     "yum install cairo-devel -y"
 ]
-
-#[[tool.cibuildwheel.overrides]]
-#select = "cp3{8,9,10}-*"
-#manylinux-x86_64-image = "manylinux2010"
 
 # MacOS
 [tool.cibuildwheel.macos]

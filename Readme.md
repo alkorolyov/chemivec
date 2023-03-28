@@ -46,7 +46,14 @@ Download from pip
 
 `pip install chemivec`
 
+### 
+
+
+`python3 -m twine check wheelhouse/*`
+
 ### Build from sources
+
+
 
 #### Ubuntu
 sudo apt install build-essential ninja-build mc wget git libcairo2-dev zlib1g-dev -y
@@ -65,7 +72,7 @@ mamba activate cp310
 mamba install pip pytest -y
 pip install .
 
-# (optional) to build in cibuildwheel
+#### (optional) to build in cibuildwheel
 pip install cibuildwheel
 sudo apt-get install docker.io -y; sudo groupadd docker; sudo usermod -aG docker $USER
 sudo reboot now
@@ -74,13 +81,13 @@ cibuildwheel --platform linux
 
 #### Windows
 
-# mingw64 on windows
-# download stable mingw64 release, extract and add to %Path%
+mingw64 on windows
+download stable mingw64 release, extract and add to %Path%
 https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-10.0.0-msvcrt-r1/winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64msvcrt-10.0.0-r1.zip
-# download ninja and also add to %Path%
+download ninja and also add to %Path%
 https://github.com/ninja-build/ninja/releases/download/v1.11.1/ninja-win.zip
-cmake -B build -G "Ninja" -D CMAKE_C_COMPILER=gcc.exe -D CMAKE_CXX_COMPILER=g++.exe .
-cmake --build build --target _chemivec
+`cmake -B build -G "Ninja" -D CMAKE_C_COMPILER=gcc.exe -D CMAKE_CXX_COMPILER=g++.exe .`
+`cmake --build build --target _chemivec`
 
 ### Misc
 To check dependencies of your `*.pyd` library

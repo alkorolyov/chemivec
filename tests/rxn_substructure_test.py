@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
 import pytest
-import re
-import io
 import os
 import sys
 import multiprocessing as mp
