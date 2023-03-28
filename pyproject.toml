@@ -21,12 +21,22 @@ build-backend = "scikit_build_core.build"
 build-dir = "build" #for local `pip install . `
 
 [tool.cibuildwheel]
-# Python >= 3.8, skip 32bit
-skip = "*-win32 *-manylinux_i686"
+# Minimum supported Python >= 3.8, 
+# Skipping 32bit and muslinux images
+# Using default "manylinux2014" image
+# For python < 3.10 additonal "manylinux2010" source compilated
+
+skip = "*-win32 *_i686 *-musllinux_*" 
 build = "cp3{8,9,10,11}-*"
 test-requires = "pytest"
 test-command = "pytest {project}/tests"
 build-verbosity = 1
+
+[tool.cibuildwheel.environment]
+#CMAKE_ARGS="-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++"
+#CMAKE_GENERATOR="Ninja"
+#PIP_PREFER_BINARY="true"
+
 
 # Windows
 [tool.cibuildwheel.windows]
@@ -34,20 +44,25 @@ build-verbosity = 1
 [tool.cibuildwheel.windows.environment]
 CMAKE_ARGS="-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++"
 CMAKE_GENERATOR="Ninja"
+PIP_PREFER_BINARY="true"
 
 # Linux
-[tool.cibuildwheel.linux]
-manylinux-x86_64-image = "manylinux1"
-environment-pass = ["CMAKE_ARGS", "CMAKE_GENERATOR", "CIBUILDWHEEL"]
-before-build = [
-    "yum install cairo-devel -y"
-]
-
 [tool.cibuildwheel.linux.environment]
 CMAKE_ARGS="-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++"
 CMAKE_GENERATOR="Ninja"
+PIP_PREFER_BINARY="true"
+
+[tool.cibuildwheel.linux]
+manylinux-x86_64-image = "manylinux2014"
+environment-pass = ["CMAKE_ARGS", "CMAKE_GENERATOR", "CIBUILDWHEEL", "PIP_PREFER_BINARY"]
+before-all = [
+    "yum install cairo-devel -y"
+]
+
+#[[tool.cibuildwheel.overrides]]
+#select = "cp3{8,9,10}-*"
+#manylinux-x86_64-image = "manylinux2010"
 
 # MacOS
 [tool.cibuildwheel.macos]
 archs = ["x86_64", "arm64"]
-
