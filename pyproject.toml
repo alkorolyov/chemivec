@@ -37,7 +37,6 @@ CMAKE_GENERATOR="Ninja"
 
 # Linux
 [tool.cibuildwheel.linux]
-manylinux-x86_64-image = "manylinux1"
 environment-pass = ["CMAKE_ARGS", "CMAKE_GENERATOR", "CIBUILDWHEEL"]
 before-build = [
     "yum install cairo-devel -y"
