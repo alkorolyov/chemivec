@@ -20,8 +20,8 @@ string(APPEND CMAKE_C_FLAGS " ${OpenMP_C_FLAGS}")
 string(APPEND CMAKE_CXX_FLAGS " ${OpenMP_CXX_FLAGS}")
 
 if (UNIX AND CMAKE_CXX_COMPILER_ID STREQUAL GNU)
-    string(APPEND CMAKE_C_FLAGS " -static-libstdc++ -static-libgcc -lgomp")
-    string(APPEND CMAKE_CXX_FLAGS " -static-libstdc++ -static-libgcc -lgomp")
+    string(APPEND CMAKE_C_FLAGS " -static-libstdc++ -static-libgcc")
+    string(APPEND CMAKE_CXX_FLAGS " -static-libstdc++ -static-libgcc")
 endif()
 
 if (MINGW AND WIN32)

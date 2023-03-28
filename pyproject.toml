@@ -37,7 +37,6 @@ build-verbosity = 1
 #CMAKE_GENERATOR="Ninja"
 #PIP_PREFER_BINARY="true"
 
-
 # Windows
 [tool.cibuildwheel.windows]
 
