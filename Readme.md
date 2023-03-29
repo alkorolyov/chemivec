@@ -67,8 +67,8 @@ echo "if [ -f ~/.bashrc ]; then
 fi" >> ~/.bash_profile
 # restart shell
 conda config --set auto_activate_base false
-mamba create -n cp310 python=3.10
-mamba activate cp310
+mamba create -n dev
+mamba activate dev
 mamba install pip pytest -y
 pip install .
 
