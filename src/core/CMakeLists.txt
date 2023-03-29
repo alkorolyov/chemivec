@@ -15,21 +15,10 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
         PUBLIC ${Python3_INCLUDE_DIRS}
         PUBLIC ${Python3_NumPy_INCLUDE_DIRS}
-
-#        PUBLIC ${Python_INCLUDE_DIRS}
-#	    PUBLIC ${Python3_INCLUDE_DIR}
-#        PUBLIC ${Python_NumPy_INCLUDE_DIRS}
-
-#        PRIVATE ${OpenMP_C_INCLUDE_DIRS}
-#        PRIVATE ${OpenMP_CXX_INCLUDE_DIRS}
         )
 
 target_link_libraries(
         ${PROJECT_NAME}
         PUBLIC indigo-static
         PUBLIC ${Python3_LIBRARIES}
-#        PUBLIC ${NumPy_LIBRARIES}
-#        PRIVATE OpenMP::OpenMP_C
-#        PRIVATE OpenMP::OpenMP_CXX
-
 )

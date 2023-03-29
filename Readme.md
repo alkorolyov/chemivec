@@ -89,6 +89,14 @@ https://github.com/ninja-build/ninja/releases/download/v1.11.1/ninja-win.zip
 `cmake -B build -G "Ninja" -D CMAKE_C_COMPILER=gcc.exe -D CMAKE_CXX_COMPILER=g++.exe .`
 `cmake --build build --target _chemivec`
 
+#### MacOS
+
+https://github.com/DrDonk/unlocker
+https://www.wikigain.com/how-to-install-macos-monterey-on-vmware-on-windows-pc/
+https://intoguide.com/install-vmware-tools-on-macos-monterey/
+https://href.li/?https://softwareupdate.vmware.com/cds/vmw-desktop/fusion/11.1.0/13668589/packages/com.vmware.fusion.tools.darwin.zip.tar
+
+
 ### Misc
 To check dependencies of your `*.pyd` library
 dumpbin should be run from developer command prompt of VS 2022

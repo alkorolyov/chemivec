@@ -8,7 +8,6 @@
 PyArrayObject *cstr2numpy(char **strings, int size) {
     npy_intp dims[] = {size};
 
-
     // create empty 1D numpy array of python objects
     PyArrayObject* arr = (PyArrayObject*)PyArray_EMPTY(1, dims, NPY_OBJECT, NPY_ARRAY_C_CONTIGUOUS);
 
@@ -159,7 +158,6 @@ reactionMatchNumPy(PyObject *np_input, char *querySmarts, char *aamMode, int num
 //    }
 
     // set n_jobs
-
 
     // check query SMARTS
     if (checkReactionSmarts(querySmarts, options->sid) == -1) {

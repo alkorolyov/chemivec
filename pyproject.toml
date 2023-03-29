@@ -1,6 +1,6 @@
 [project]
 name="chemivec"
-version="0.1.0"
+version="0.1.1"
 description="Vectorized cheminformatics library leveraging EPAM Indigo Toolkit"
 readme = "Readme.md"
 requires-python = ">=3.8"
@@ -8,6 +8,9 @@ dependencies = [
     'numpy>=1.7',
     'pandas'
 ]
+
+[project.urls]
+"Homepage" = "https://github.com/alkorolyov/chemivec"
 
 [build-system]
 requires = [
