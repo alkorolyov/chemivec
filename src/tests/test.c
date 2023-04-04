@@ -47,7 +47,7 @@ void test_reaction_batch() {
     npy_bool output[2];
     int size = 2;
 
-    ReactionBatch batch;
+    Batch batch;
     batch.sid = sid;
     batch.pinput = input;
     batch.poutput = output;
@@ -56,14 +56,11 @@ void test_reaction_batch() {
 
     indigoSetSessionId(sid);
     const char* querySmarts = "[C:1]=O>>[C:1]O";
-    qword query = indigoLoadReactionSmartsFromString(querySmarts);
-    if (query == -1) {
-        printf("Invalid SMARTS %s\n", querySmarts);
-        exit(EXIT_FAILURE);
-    }
+    int query = indigoLoadReactionSmartsFromString(querySmarts);
     indigoOptimize(query, NULL);
 
     reactionMatchBatch(&batch, query, "DAYLIGHT-AAM");
+    indigoFree(query);
 
     TEST_ASSERT_EQUAL(output[0], 1);
     TEST_ASSERT_EQUAL(output[1], 0);
@@ -96,12 +93,14 @@ void test_reaction_vec() {
     TEST_ASSERT_EQUAL(output[1], 0);
 }
 
+
+
 void test_incorrect_smi_batch() {
     char* input[] = {"[C:1=O>>[C:1]O"};
     npy_bool output[] = {1};
     int size = 1;
 
-    ReactionBatch batch;
+    Batch batch;
     batch.sid = sid;
     batch.pinput = input;
     batch.poutput = output;
@@ -110,14 +109,11 @@ void test_incorrect_smi_batch() {
 
     indigoSetSessionId(sid);
     const char* querySmarts = "CO>>";
-    qword query = indigoLoadReactionSmartsFromString(querySmarts);
-    if (query == -1) {
-        printf("Invalid SMARTS %s\n", querySmarts);
-        exit(EXIT_FAILURE);
-    }
+    int query = indigoLoadReactionSmartsFromString(querySmarts);
     indigoOptimize(query, NULL);
 
     reactionMatchBatch(&batch, query, "DAYLIGHT-AAM");
+    indigoFree(query);
     TEST_ASSERT_EQUAL(output[0], 0);
 
 }
@@ -141,6 +137,52 @@ void test_reaction_smarts() {
 }
 
 
+void test_substructure_batch() {
+    char* input[] = {"CC", "CO"};
+    npy_bool output[2];
+    int size = 2;
+
+    Batch batch;
+    batch.sid = sid;
+    batch.pinput = input;
+    batch.poutput = output;
+    batch.size = size;
+    batch.threadid = 0;
+
+    indigoSetSessionId(sid);
+    const char* querySmarts = "CC";
+    int query = indigoLoadSmartsFromString(querySmarts);
+    indigoOptimize(query, NULL);
+
+    structureMatchBatch(&batch, query, NULL);
+    indigoFree(query);
+    TEST_ASSERT_EQUAL(output[0], 1);
+    TEST_ASSERT_EQUAL(output[1], 0);
+}
+
+void test_substructure_lin() {
+    char* input[] = {"CC", "CO"};
+    npy_bool output[2];
+    int size = 2;
+
+    char* querySmarts = "CC";
+    structureMatchLin(input, output, size, querySmarts, NULL);
+    TEST_ASSERT_EQUAL(output[0], 1);
+    TEST_ASSERT_EQUAL(output[1], 0);
+}
+
+void test_substructure_vec() {
+    char* input[] = {"CC", "CO"};
+    npy_bool output[2];
+    int size = 2;
+
+    char* querySmarts = "CC";
+    int max_cores = omp_get_max_threads();
+    structureMatchVec(input, output, size, querySmarts, NULL, max_cores);
+    TEST_ASSERT_EQUAL(output[0], 1);
+    TEST_ASSERT_EQUAL(output[1], 0);
+}
+
 
 int main(void) {
     UNITY_BEGIN();
@@ -158,6 +200,9 @@ int main(void) {
     RUN_TEST(test_incorrect_smi_batch);
     RUN_TEST(test_incorrect_smi_vec);
     RUN_TEST(test_reaction_smarts);
+    RUN_TEST(test_substructure_batch);
+    RUN_TEST(test_substructure_lin);
+    RUN_TEST(test_substructure_vec);
 
     if (indigoCountReferences() > 0) {
         indigoFreeAllObjects();

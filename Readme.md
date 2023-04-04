@@ -4,10 +4,11 @@ Vectorized Cheminformatics Python library, based on EPAM Indigo toolkit C-API
 and using NumPy for input/output.
 
 ### Supported operations:
-`rxn_subsearch` - reaction substructure match
-
-    `input`         : reaction SMILES array (numpy, pandas and python list supported)
-    `query_smarts`  : reaction query SMARTS
+```
+rxn_subsearch(input, query) - reaction substructure match
+    input : reaction SMILES array (numpy, pandas and python list supported)
+    query : reaction query SMARTS, ex "C=C>>C-C"
+```
 
 ### Example usage:
 
@@ -17,7 +18,7 @@ import chemivec
 
 arr = np.array(['[C:1]=O>>[C:1]O', 'C=O>>CO'])
 query = "[C:1]=O>>[C:1]O"
-res = chemivec.rxn_subsearch(arr, query_smarts=query)
+res = chemivec.rxn_subsearch(arr, query=query)
 print(res)
 
 # Output: array([ True, False]) 
@@ -31,13 +32,14 @@ Number of cores can be specified as a global option or passed as a parameter.
 ```python
 import chemivec
 
-chemivec.rxn_subsearch(arr, query_smarts=query)   # default max available cores
+chemivec.rxn_subsearch(arr, query=query)   # default max available cores
 chemivec.set_option("n_jobs", 12)                 # change defaults
-chemivec.rxn_subsearch(arr, query_smarts=query, n_jobs=8)
+chemivec.rxn_subsearch(arr, query=query, n_jobs=8)
 ```
 
-`Atom-to-atom matching` follows the standard DAYLIGHT SMARTS rules
-declared here https://www.daylight.com/dayhtml/doc/theory/theory.smarts.html (Section 4.6 Reaction Queries).
+### Atom-to-atom matching (AAM) 
+If atom mapping is present in the query, ex `[C:1]>>[C:1]` chemivec follows the standard DAYLIGHT SMARTS rules
+declared here https://www.daylight.com/dayhtml/doc/theory/theory.smarts.html (Section 4.6 Reaction Queries)
 
 
 ### Install
@@ -46,22 +48,17 @@ Download from pip
 
 `pip install chemivec`
 
-### 
-
-
-`python3 -m twine check wheelhouse/*`
-
 ### Build from sources
 
-
+`python3 -m twine check wheelhouse/*`
 
 #### Ubuntu
 sudo apt install build-essential ninja-build mc wget git libcairo2-dev zlib1g-dev -y
 git clone https://github.com/alkorolyov/chemivec
 
 wget https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh;chmod +x Mambaforge-Linux-x86_64.sh;bash Mambaforge-Linux-x86_64.sh;export MAMBA_NO_BANNER=1
-# if conda still not seen then ~/.bashrc is not sourced when you log in using SSH.
-# You need to source it in your ~/.bash_profile like this:
+### if conda still not seen then ~/.bashrc is not sourced when you log in using SSH.
+### You need to source it in your ~/.bash_profile like this:
 echo "if [ -f ~/.bashrc ]; then
 . ~/.bashrc
 fi" >> ~/.bash_profile

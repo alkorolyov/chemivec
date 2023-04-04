@@ -12,4 +12,9 @@ set(ENABLE_TESTS OFF CACHE STRING "Enable Indigo CTest tests" FORCE)
 
 # Tests
 set(TEST_CHEMIVEC ON CACHE STRING "Enable Chemivec CTest tests")
+set(CIBUILDWHEEL OFF CACHE STRING "Build during cibuildwheel session")
+if ($ENV{CIBUILDWHEEL} MATCHES 1)
+    set(CIBUILDWHEEL ON)
+endif()
+#set(CIBUILDWHEELS $ENV{CIBUILDWHEELS} CACHE STRING "Cibuildwheel presence" FORCE)
 add_subdirectory(src)

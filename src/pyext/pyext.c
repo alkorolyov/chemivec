@@ -15,7 +15,7 @@
 static ChemivecOptions* options;
 
 static int initOptions(qword SessionId) {
-    options = (ChemivecOptions*) PyMem_Malloc(sizeof(options));
+    options = (ChemivecOptions*) PyMem_Malloc(sizeof(ChemivecOptions));
     if (options == NULL) {
         return -1;
     }
@@ -221,21 +221,21 @@ int main() {
 
 /**
  * Set option by name
- * Option names and values always passed as Unicode Python strings
- * type checking is done on the python side
+ * Option names passed as Unicode Python strings. Option values are passed
+ * as Python object, with correct type. Type checking is done on the python side
  * @param self
- * @param args option name, option value as python strings
+ * @param args option name, option value
  * @return None if successful
  */
 PyObject* _set_option(PyObject* self, PyObject* args) {
     char* option_name;
-    char* option_value;
-    if (!PyArg_ParseTuple(args, "ss", &option_name, &option_value)) {
+    PyObject * option_value;
+    if (!PyArg_ParseTuple(args, "sO", &option_name, &option_value)) {
         return NULL;
     }
 
     if (strcmp(option_name, "n_jobs") == 0) {
-        options->n_jobs = atoi(option_value);
+        options->n_jobs = PyLong_AsLong(option_value);
 //        printf("set n_jobs: %d\n", options->n_jobs);
         return Py_None;
     } else {
@@ -258,7 +258,7 @@ PyObject* _get_option(PyObject* self, PyObject* args) {
 
     if (strcmp(option_name, "n_jobs") == 0) {
 //        printf("get n_jobs: %d\n", options->n_jobs);
-        PyObject* value = PyUnicode_FromFormat("%d", options->n_jobs);
+        PyObject* value = PyLong_FromLong(options->n_jobs);
 //        Py_DecRef(value);
         return value;
     } else {
@@ -270,8 +270,8 @@ PyObject* _get_option(PyObject* self, PyObject* args) {
 
 
 
-PyObject* _rxn_match(PyObject* self, PyObject* args, PyObject* kwargs) {
-    static char* keywords[] = {"np_input", "query_smarts", "aam_mode", "n_jobs", NULL};
+PyObject* _rxn_subsearch(PyObject* self, PyObject* args, PyObject* kwargs) {
+    static char* keywords[] = {"np_input", "query", "aam_mode", "n_jobs", NULL};
 
     PyObject* np_input;
     char* querySmarts;
@@ -283,7 +283,7 @@ PyObject* _rxn_match(PyObject* self, PyObject* args, PyObject* kwargs) {
         return NULL;
     }
 
-    return (PyObject*) reactionMatchNumPy(np_input, querySmarts, aamMode, numCores, options);
+    return (PyObject*) reactionMatchNumPy(np_input, querySmarts, aamMode, numCores);
 }
 
 
@@ -294,7 +294,7 @@ PyObject* _rxn_smarts_isok(PyObject* self, PyObject* args) {
     }
 
     indigoSetSessionId(options->sid);
-    qword query = indigoLoadReactionSmartsFromString(smarts);
+    int query = indigoLoadReactionSmartsFromString(smarts);
 
     if (query == -1) {
         return Py_False;
@@ -307,11 +307,11 @@ PyObject* _rxn_smarts_isok(PyObject* self, PyObject* args) {
 
 // Define the module methods
 static PyMethodDef methods[] = {
-        {"_rxn_match", (PyCFunction) _rxn_match, METH_VARARGS | METH_KEYWORDS, "C-API vecorized reaction match"},
+        {"_rxn_subsearch", (PyCFunction) _rxn_subsearch,     METH_VARARGS | METH_KEYWORDS, "C-API vecorized reaction match"},
         {"_rxn_smarts_isok", (PyCFunction) _rxn_smarts_isok, METH_VARARGS, "Check reaction SMARTS"},
-        {"_set_option", (PyCFunction) _set_option, METH_VARARGS,           "Set option"},
-        {"_get_option", (PyCFunction) _get_option, METH_VARARGS,           "Get option"},
-        {NULL, NULL, 0, NULL}   // Sentinel value to indicate end of list
+        {"_set_option", (PyCFunction) _set_option,           METH_VARARGS,           "Set option"},
+        {"_get_option", (PyCFunction) _get_option,           METH_VARARGS,           "Get option"},
+        {NULL, NULL, 0,                                                                    NULL}   // Sentinel value to indicate end of list
 };
 
 
