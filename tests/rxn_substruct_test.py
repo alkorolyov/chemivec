@@ -112,7 +112,7 @@ def test_empty_query():
         rxn_subsearch(arr, query)
 
 
-""" TEST THIRD ARGUMENT - aam_mode """
+""" TEST THIRD ARGUMENT - mode """
 
 def test_aam_mode():
     arr = np.array(['[C:1]=O>>[C:1]O',

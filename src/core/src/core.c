@@ -5,6 +5,31 @@
 #define NO_IMPORT_ARRAY // NumPy C-API is already imported
 #include "core.h"
 
+#define CREATE_NUMPY_VEC(np_input, dtype) \
+    char ** in_data = numpy2cstr((PyArrayObject*)np_input); \
+    int size = PyArray_SIZE((PyArrayObject*)np_input);      \
+    npy_intp dims[] = {size};            \
+    PyArrayObject* np_output = (PyArrayObject*)PyArray_EMPTY(1, dims, dtype, NPY_ARRAY_C_CONTIGUOUS); \
+    npy_bool* out_data = (npy_bool*) PyArray_DATA(np_output); // output boolean array
+
+#define RETURN_NUMPY_VEC \
+    PyMem_Free(in_data); \
+    PyArray_XDECREF(np_output); \
+    return (PyObject*)np_output;
+
+#define CREATE_THREAD_BATCH(size, n_jobs) \
+        Batch* batch = malloc(sizeof(Batch)); \
+        batch->sid = indigoAllocSessionId();  \
+        batch->threadid = omp_get_thread_num(); \
+        int batch_size = size / n_jobs; \
+        int start_idx = batch->threadid * batch_size; \
+        int end_idx = start_idx + batch_size; \
+        if (batch->threadid == n_jobs - 1) end_idx = size; \
+        batch->pinput = in_data + start_idx;  \
+        batch->poutput = out_data + start_idx;\
+        batch->size = end_idx - start_idx;
+
+
 PyArrayObject *cstr2numpy(char **strings, int size) {
     npy_intp dims[] = {size};
 
@@ -106,23 +131,24 @@ void reactionMatchLin(char **in_data, npy_bool *out_data, int size, char *queryS
 void reactionMatchVec(char **in_data, npy_bool *out_data, int size, char *querySmarts, const char *mode, int n_jobs) {
 
     // Multi Thread
-    int batch_size = size / n_jobs;
 
     // NO PYTHON FUNCTIONS HERE
     #pragma omp parallel num_threads(n_jobs)
     {
         // Create batch per each thread
-        Batch* batch = malloc(sizeof(Batch));
-        batch->sid = indigoAllocSessionId();
-        batch->threadid = omp_get_thread_num();
-        int start_idx = batch->threadid * batch_size;
-        int end_idx = start_idx + batch_size;
-        if (batch->threadid == n_jobs - 1) {
-            end_idx = size; // last batch
-        }
-        batch->pinput = in_data + start_idx;
-        batch->poutput = out_data + start_idx;
-        batch->size = end_idx - start_idx;
+        CREATE_THREAD_BATCH(size, n_jobs)
+//        Batch* batch = malloc(sizeof(Batch));
+//        batch->sid = indigoAllocSessionId();
+//        batch->threadid = omp_get_thread_num();
+//        int batch_size = size / n_jobs;
+//        int start_idx = batch->threadid * batch_size;
+//        int end_idx = start_idx + batch_size;
+//        if (batch->threadid == n_jobs - 1) {
+//            end_idx = size; // last batch
+//        }
+//        batch->pinput = in_data + start_idx;
+//        batch->poutput = out_data + start_idx;
+//        batch->size = end_idx - start_idx;
 
         // Create query object
         int query = indigoLoadReactionSmartsFromString(querySmarts);
@@ -143,18 +169,18 @@ void reactionMatchVec(char **in_data, npy_bool *out_data, int size, char *queryS
 }
 
 PyObject* reactionMatchNumPy(PyObject *np_input, char *querySmarts, char *aamMode, int n_jobs) {
-    CREATE_NPY_BOOL_ARRAY(np_input, size)
+    CREATE_NUMPY_VEC(np_input, NPY_BOOL)
+//    char ** in_data = numpy2cstr((PyArrayObject*)np_input);
+
 //    int size = PyArray_SIZE((PyArrayObject*)np_input);
 //    npy_intp dims[] = {size};
-//    char ** in_data = numpy2cstr((PyArrayObject*)np_input);
-//
 //    PyArrayObject* np_output = (PyArrayObject*)PyArray_EMPTY(1, dims, NPY_BOOL, NPY_ARRAY_C_CONTIGUOUS);
 //    npy_bool* out_data = (npy_bool*) PyArray_DATA(np_output); // output boolean array
 
     reactionMatchVec(in_data, out_data, size, querySmarts, aamMode, n_jobs);
-//    reactionMatchLin(in_data, out_data, size, querySmarts, aam_mode);
+//    reactionMatchLin(in_data, out_data, size, querySmarts, mode);
 
-    RETURN_NPY_BOOL(in_data, np_output)
+    RETURN_NUMPY_VEC
 //    PyMem_Free(in_data);
 //    PyArray_XDECREF(np_output);
 //    return (PyObject*)np_output;
@@ -207,24 +233,24 @@ void structureMatchLin(char **in_data, npy_bool *out_data, int size, char *query
 
 void structureMatchVec(char **in_data, npy_bool *out_data, int size, char *querySmarts, char *mode, int n_jobs) {
     // Multi Thread
-    int batch_size = size / n_jobs;
 
-    // ONLY THREAD FUNCTIONS HERE
+
+    // ONLY THREAD SAFE FUNCTIONS HERE
     #pragma omp parallel num_threads(n_jobs)
     {
         // Create batch per each thread
-        Batch* batch = malloc(sizeof(Batch));
-        batch->sid = indigoAllocSessionId();
-        batch->threadid = omp_get_thread_num();
-        int start_idx = batch->threadid * batch_size;
-        int end_idx = start_idx + batch_size;
-        if (batch->threadid == n_jobs - 1) {
-            end_idx = size; // last batch
-        }
-        batch->pinput = in_data + start_idx;
-        batch->poutput = out_data + start_idx;
-        batch->size = end_idx - start_idx;
-
+        CREATE_THREAD_BATCH(size, n_jobs)
+//        Batch* batch = malloc(sizeof(Batch));
+//        batch->sid = indigoAllocSessionId();
+//        batch->threadid = omp_get_thread_num();
+//        int start_idx = batch->threadid * batch_size;
+//        int end_idx = start_idx + batch_size;
+//        if (batch->threadid == n_jobs - 1) {
+//            end_idx = size; // last batch
+//        }
+//        batch->pinput = in_data + start_idx;
+//        batch->poutput = out_data + start_idx;
+//        batch->size = end_idx - start_idx;
         // Create query object
         int query = indigoLoadSmartsFromString(querySmarts);
         if (query == -1) {
@@ -245,7 +271,7 @@ void structureMatchVec(char **in_data, npy_bool *out_data, int size, char *query
 }
 
 PyObject* structureMatchNumpy(PyObject *np_input, char* querySmarts, char *mode, int numCores) {
-    CREATE_NPY_BOOL_ARRAY(np_input, size)
+    CREATE_NUMPY_VEC(np_input, NPY_BOOL)
 //    int size = PyArray_SIZE((PyArrayObject*)np_input);
 //    npy_intp dims[] = {size};
 //    char ** in_data = numpy2cstr((PyArrayObject*)np_input);
@@ -255,10 +281,12 @@ PyObject* structureMatchNumpy(PyObject *np_input, char* querySmarts, char *mode,
 
     structureMatchLin(in_data, out_data, size, querySmarts, mode);
 
-    RETURN_NPY_BOOL(in_data, np_output)
+    RETURN_NUMPY_VEC
 //    PyMem_Free(in_data);
 //    PyArray_XDECREF(np_output);
 //    return (PyObject*)np_output;
 }
+
+
 
 

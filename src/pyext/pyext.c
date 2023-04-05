@@ -268,23 +268,38 @@ PyObject* _get_option(PyObject* self, PyObject* args) {
 
 }
 
-
-
 PyObject* _rxn_subsearch(PyObject* self, PyObject* args, PyObject* kwargs) {
-    static char* keywords[] = {"np_input", "query", "aam_mode", "n_jobs", NULL};
+    static char* keywords[] = {"", "query", "mode", "n_jobs", NULL};
 
     PyObject* np_input;
     char* querySmarts;
     char* aamMode;
-    int numCores;
+    int n_jobs;
 
     // Parse the arguments using PyArg_ParseTuple
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "Ossi", keywords, &np_input, &querySmarts, &aamMode, &numCores)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "Ossi", keywords, &np_input, &querySmarts, &aamMode, &n_jobs)) {
         return NULL;
     }
 
-    return (PyObject*) reactionMatchNumPy(np_input, querySmarts, aamMode, numCores);
+    return (PyObject*) reactionMatchNumPy(np_input, querySmarts, aamMode, n_jobs);
 }
+
+PyObject* _mol_subsearch(PyObject* self, PyObject* args, PyObject* kwargs) {
+    static char* keywords[] = {"", "query", "mode", "n_jobs", NULL};
+
+    PyObject* np_input;
+    char* querySmarts;
+    char* mode;
+    int n_jobs;
+
+    // Parse the arguments using PyArg_ParseTuple
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "Ossi", keywords, &np_input, &querySmarts, &mode, &n_jobs)) {
+        return NULL;
+    }
+
+    return (PyObject*) structureMatchNumpy(np_input, querySmarts, mode, n_jobs);
+}
+
 
 
 PyObject* _rxn_smarts_isok(PyObject* self, PyObject* args) {
@@ -309,6 +324,7 @@ PyObject* _rxn_smarts_isok(PyObject* self, PyObject* args) {
 static PyMethodDef methods[] = {
         {"_rxn_subsearch", (PyCFunction) _rxn_subsearch,     METH_VARARGS | METH_KEYWORDS, "C-API vecorized reaction match"},
         {"_rxn_smarts_isok", (PyCFunction) _rxn_smarts_isok, METH_VARARGS, "Check reaction SMARTS"},
+        {"_mol_subsearch", (PyCFunction) _mol_subsearch,     METH_VARARGS | METH_KEYWORDS, "C-API vecorized structure match"},
         {"_set_option", (PyCFunction) _set_option,           METH_VARARGS,           "Set option"},
         {"_get_option", (PyCFunction) _get_option,           METH_VARARGS,           "Get option"},
         {NULL, NULL, 0,                                                                    NULL}   // Sentinel value to indicate end of list

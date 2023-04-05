@@ -48,21 +48,4 @@ void structureMatchBatch(Batch* batch, int query, char* mode);
 
 void structureMatchVec(char **in_data, npy_bool *out_data, int size, char *querySmarts, char *mode, int n_jobs);
 
-inline static void finishSearch(int rxn, int matcher, int match) {
-    indigoFree(rxn);
-    indigoFree(matcher);
-    indigoFree(match);
-}
-
-#define CREATE_NPY_BOOL_ARRAY(np_input, size)\
-    int size = PyArray_SIZE((PyArrayObject*)np_input);\
-    npy_intp dims[] = {size};\
-    char ** in_data = numpy2cstr((PyArrayObject*)np_input);\
-    PyArrayObject* np_output = (PyArrayObject*)PyArray_EMPTY(1, dims, NPY_BOOL, NPY_ARRAY_C_CONTIGUOUS);\
-    npy_bool* out_data = (npy_bool*) PyArray_DATA(np_output); // output boolean array
-
-#define RETURN_NPY_BOOL(in_data, np_output)\
-    PyMem_Free(in_data);\
-    PyArray_XDECREF(np_output);\
-    return (PyObject*)np_output;
-
+PyObject* structureMatchNumpy(PyObject *np_input, char* querySmarts, char *mode, int numCores);
