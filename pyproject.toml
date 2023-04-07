@@ -1,6 +1,6 @@
 [project]
 name="chemivec"
-version="0.1.1"
+version="0.0.1a"
 description="Vectorized cheminformatics library leveraging EPAM Indigo Toolkit"
 readme = "Readme.md"
 requires-python = ">=3.8"
