@@ -42,6 +42,8 @@ void reactionMatchVec(char **in_data, npy_bool *out_data, int size, char *queryS
 
 PyObject* reactionMatchNumPy(PyObject *np_input, char *querySmarts, char *aamMode, int n_jobs);
 
+int checkStructureSmarts(char* smarts, qword sid);
+
 void structureMatchLin(char **in_data, npy_bool *out_data, int size, char *querySmarts, char *mode);
 
 void structureMatchBatch(Batch* batch, int query, char* mode);

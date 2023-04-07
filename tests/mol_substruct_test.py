@@ -70,9 +70,8 @@ def test_multi_dim():
 def test_empty_array():
     arr = np.array([])
     query = "C=O"
-    res = mol_subsearch(arr, query)
-    assert res.shape[0] == 0
-    assert res.dtype == np.bool_
+    with pytest.raises(ValueError, match="Input array cannot be empty"):
+        mol_subsearch(arr, query)
 
 
 # def test_bad_reaction_smiles():

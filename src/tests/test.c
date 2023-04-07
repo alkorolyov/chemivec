@@ -37,7 +37,7 @@ void test_numpy_to_cstr() {
     TEST_ASSERT_EQUAL_STRING(c_strings[0], "foo");
     TEST_ASSERT_EQUAL_STRING(c_strings[1], "bar");
 
-    PyMem_Free(c_strings);
+    free(c_strings);
     PyArray_XDECREF(np_array);
 }
 

@@ -19,7 +19,7 @@
     npy_bool* out_data = (npy_bool*) PyArray_DATA(np_output); // output boolean array
 
 #define RETURN_NUMPY_VEC \
-    PyMem_Free(in_data); \
+    free(in_data); \
     PyArray_XDECREF(np_output); \
     return (PyObject*)np_output;
 
@@ -99,7 +99,7 @@ PyArrayObject *cstr2numpy(char **strings, int size) {
 char** numpy2cstr(PyArrayObject* np_array) {
     PyObject** pystr = PyArray_DATA(np_array);
     npy_intp size = PyArray_SIZE(np_array);
-    char** cstr = PyMem_Malloc(size * sizeof(char*));
+    char** cstr = malloc(size * sizeof(char*));
     for (npy_intp i = 0; i < size; i++) {
         cstr[i] = (char*)PyUnicode_AsUTF8(pystr[i]);
     }
@@ -109,6 +109,16 @@ char** numpy2cstr(PyArrayObject* np_array) {
 int checkReactionSmarts(char* smarts, qword sid){
     indigoSetSessionId(sid);
     int query = indigoLoadReactionSmartsFromString(smarts);
+    if (query == -1) {
+        return -1;
+    }
+    indigoFree(query);
+    return 0;
+}
+
+int checkStructureSmarts(char* smarts, qword sid){
+    indigoSetSessionId(sid);
+    int query = indigoLoadSmartsFromString(smarts);
     if (query == -1) {
         return -1;
     }
@@ -187,78 +197,27 @@ void reactionMatchVec(char **in_data, npy_bool *out_data, int size, char *queryS
     // NO PYTHON FUNCTIONS HERE
     #pragma omp parallel num_threads(n_jobs)
     {
-        // Create batch per each thread
         CREATE_THREAD_BATCH(in_data, out_data, size)
-//        Batch* batch = malloc(sizeof(Batch));
-//        batch->sid = indigoAllocSessionId();
-//        batch->threadid = omp_get_thread_num();
-//        int batch_size = size / n_jobs;
-//        int start_idx = batch->threadid * batch_size;
-//        int end_idx = start_idx + batch_size;
-//        if (batch->threadid == n_jobs - 1) {
-//            end_idx = size; // last batch
-//        }
-//        batch->pinput = in_data + start_idx;
-//        batch->poutput = out_data + start_idx;
-//        batch->size = end_idx - start_idx;
-        // Create query object
         CREATE_QUERY_SMARTS(indigoLoadReactionSmartsFromString, querySmarts)
-//        int query = indigoLoadReactionSmartsFromString(querySmarts);
-//        if (query == -1) {
-//            printf("Invalid reaction SMARTS %s\n", querySmarts);
-//            exit(EXIT_FAILURE);
-//        }
-//        indigoOptimize(query, NULL);
 
         reactionMatchBatch(batch, query, mode);
         
         FREE_QUERY(query)
         FREE_BATCH(batch)
-//        indigoReleaseSessionId(batch->sid);
-//        free(batch);
     }
-
-    return;
 }
 
 PyObject* reactionMatchNumPy(PyObject *np_input, char *querySmarts, char *aamMode, int n_jobs) {
     CREATE_NUMPY_VEC(np_input, NPY_BOOL)
-//    char ** in_data = numpy2cstr((PyArrayObject*)np_input);
-//    int size = PyArray_SIZE((PyArrayObject*)np_input);
-//    npy_intp dims[] = {size};
-//    PyArrayObject* np_output = (PyArrayObject*)PyArray_EMPTY(1, dims, NPY_BOOL, NPY_ARRAY_C_CONTIGUOUS);
-//    npy_bool* out_data = (npy_bool*) PyArray_DATA(np_output); // output boolean array
 
     reactionMatchVec(in_data, out_data, size, querySmarts, aamMode, n_jobs);
 //    reactionMatchLin(in_data, out_data, size, querySmarts, mode);
 
     RETURN_NUMPY_VEC
-//    PyMem_Free(in_data);
-//    PyArray_XDECREF(np_output);
-//    return (PyObject*)np_output;
 }
 
 void structureMatchBatch(Batch* batch, int query, char* mode) {
     INDIGO_MATCH_BATCH(batch, indigoLoadMoleculeFromString, indigoSubstructureMatcher, query, mode)
-//    indigoSetSessionId(batch->sid);
-//    for (int i = 0; i < batch->size; i++) {
-//        int mol = indigoLoadMoleculeFromString(batch->pinput[i]);
-//        if (mol == -1) {
-//            printf("Invalid SMILES: %s\n", batch->pinput[i]);
-//            batch->poutput[i] = NPY_FALSE;
-//            continue;
-//        }
-//        int matcher = indigoSubstructureMatcher(mol, mode);
-//        int match = indigoMatch(matcher, query);
-//        if (match != 0)
-//            batch->poutput[i] = NPY_TRUE;
-//        else
-//            batch->poutput[i] = NPY_FALSE;
-//        //  printf("[%i %i]:\n in =  %s\n out = %i\n", batch->threadid, i, batch->pinput[i], batch->poutput[i]);
-//        indigoFree(mol);
-//        indigoFree(matcher);
-//        indigoFree(match);
-//    }
 }
 
 void structureMatchLin(char **in_data, npy_bool *out_data, int size, char *querySmarts, char *mode) {
@@ -271,12 +230,6 @@ void structureMatchLin(char **in_data, npy_bool *out_data, int size, char *query
     batch->size = size;
 
     CREATE_QUERY_SMARTS(indigoLoadSmartsFromString, querySmarts)
-//    int query = indigoLoadSmartsFromString(querySmarts);
-//    if (query == -1) {
-//        printf("Invalid SMARTS %s\n", querySmarts);
-//        exit(EXIT_FAILURE);
-//    }
-    indigoOptimize(query, NULL);
 
     structureMatchBatch(batch, query, mode);
 
@@ -295,25 +248,8 @@ void structureMatchVec(char **in_data, npy_bool *out_data, int size, char *query
     {
         // Create batch per each thread
         CREATE_THREAD_BATCH(in_data, out_data, size)
-//        Batch* batch = malloc(sizeof(Batch));
-//        batch->sid = indigoAllocSessionId();
-//        batch->threadid = omp_get_thread_num();
-//        int start_idx = batch->threadid * batch_size;
-//        int end_idx = start_idx + batch_size;
-//        if (batch->threadid == n_jobs - 1) {
-//            end_idx = size; // last batch
-//        }
-//        batch->pinput = in_data + start_idx;
-//        batch->poutput = out_data + start_idx;
-//        batch->size = end_idx - start_idx;
         // Create query object
         CREATE_QUERY_SMARTS(indigoLoadSmartsFromString, querySmarts)
-//        int query = indigoLoadSmartsFromString(querySmarts);
-//        if (query == -1) {
-//            printf("Invalid SMARTS %s\n", querySmarts);
-//            exit(EXIT_FAILURE);
-//        }
-//        indigoOptimize(query, NULL);
 
         structureMatchBatch(batch, query, mode);
 

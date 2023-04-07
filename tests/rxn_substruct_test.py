@@ -70,9 +70,8 @@ def test_multi_dim():
 def test_empty_array():
     arr = np.array([])
     query = "[C:1]=O>>[C:1]O"
-    res = rxn_subsearch(arr, query)
-    assert res.shape[0] == 0
-    assert res.dtype == np.bool_
+    with pytest.raises(ValueError, match="Input array cannot be empty"):
+        rxn_subsearch(arr, query)
 
 
 def test_bad_reaction_smiles():
@@ -146,7 +145,7 @@ def test_no_aam_query():
     assert res[4]
 
 
-""" TEST THIRD ARGUMENT - n_jobs """
+""" TEST FOURTH ARGUMENT - n_jobs """
 
 def test_add_option_n_jobs():
     arr = np.array(['[C]>>'])

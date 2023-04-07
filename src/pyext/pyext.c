@@ -273,15 +273,15 @@ PyObject* _rxn_subsearch(PyObject* self, PyObject* args, PyObject* kwargs) {
 
     PyObject* np_input;
     char* querySmarts;
-    char* aamMode;
+    char* mode;
     int n_jobs;
 
     // Parse the arguments using PyArg_ParseTuple
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "Ossi", keywords, &np_input, &querySmarts, &aamMode, &n_jobs)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "Ossi", keywords, &np_input, &querySmarts, &mode, &n_jobs)) {
         return NULL;
     }
 
-    return (PyObject*) reactionMatchNumPy(np_input, querySmarts, aamMode, n_jobs);
+    return (PyObject*) reactionMatchNumPy(np_input, querySmarts, mode, n_jobs);
 }
 
 PyObject* _mol_subsearch(PyObject* self, PyObject* args, PyObject* kwargs) {
