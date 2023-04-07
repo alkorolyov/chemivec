@@ -48,4 +48,4 @@ void structureMatchBatch(Batch* batch, int query, char* mode);
 
 void structureMatchVec(char **in_data, npy_bool *out_data, int size, char *querySmarts, char *mode, int n_jobs);
 
-PyObject* structureMatchNumpy(PyObject *np_input, char* querySmarts, char *mode, int numCores);
+PyObject* structureMatchNumpy(PyObject *np_input, char* querySmarts, char *mode, int n_jobs);
