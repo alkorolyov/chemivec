@@ -29,6 +29,7 @@ def _convert_to_numpy(arr: Union[np.ndarray, pd.DataFrame, pd.Series, list]) -> 
 
     return np_array
 
+
 def _convert_items_to_str(input: np.ndarray) -> np.ndarray:
     # check item type
     # first check 'np.str_' because it is subclass of 'str'
@@ -39,6 +40,7 @@ def _convert_items_to_str(input: np.ndarray) -> np.ndarray:
         raise ValueError(f"Input should be array of python or numpy strings, instead got array of {type(input[0])}")
     return out
 
+
 def _validate_shape(arr: np.ndarray):
     # check array dims
     if arr.ndim != 1:
@@ -47,16 +49,19 @@ def _validate_shape(arr: np.ndarray):
         raise ValueError(f"Input array cannot be empty")
         # return np.array([], dtype=bool)
 
+
 def _validate_input_arr(arr) -> np.ndarray:
     np_arr = _convert_to_numpy(arr)
     _validate_shape(np_arr)
     return _convert_items_to_str(np_arr)
+
 
 def _validate_n_jobs(n_jobs):
     if n_jobs:
         return _process_n_jobs(n_jobs)
     else:
         return get_option("n_jobs")
+
 
 def _validate_rxn_mode(mode: str):
     if mode != "DAYLIGHT-AAM":
@@ -129,9 +134,8 @@ def mol_subsearch(arr: Union[np.ndarray, pd.DataFrame, pd.Series, list],
                   n_jobs: Union[int, None] = None,
                   mode: str = ""
                   ) -> np.ndarray:
-    # query smarts
     _validate_mol_query(query)
     _validate_mol_mode(mode)
     n_jobs_val = _validate_n_jobs(n_jobs)
-    np_arr = _validate_input_arr(arr)
-    return _mol_subsearch(np_arr, query, mode, n_jobs_val)
+    arr_val = _validate_input_arr(arr)
+    return _mol_subsearch(arr_val, query, mode, n_jobs_val)
