@@ -30,10 +30,5 @@ if (NOT CIBUILDWHEEL)
             )
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-            COMMAND pytest ./tests -v)
+            COMMAND ${Python3_EXECUTABLE} -m pytest ./tests -v)
 endif()
-
-
-
-
-

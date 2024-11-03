@@ -50,6 +50,9 @@ Download from pip
 
 ### Build from sources
 
+`sudo apt install build-essential python3-dev libfreetype-dev libfontconfig1-dev -y`
+`pip install .`
+
 `python3 -m twine check wheelhouse/*`
 
 

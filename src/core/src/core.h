@@ -32,22 +32,22 @@ PyArrayObject* cstr2numpy(char** strings, int size);
 
 char** numpy2cstr(PyArrayObject * np_array);
 
-int checkReactionSmarts(char* smarts, qword sid);
+int check_reaction_smarts(char* smarts, qword sid);
 
-void reactionMatchBatch(Batch* batch, int query, const char *mode);
+void reaction_match_batch(Batch* batch, int query, const char *mode);
 
-void reactionMatchLin(char **in_data, npy_bool *out_data, int size, char *querySmarts, const char *mode);
+void reaction_match_lin(char **in_data, npy_bool *out_data, int size, char *querySmarts, const char *mode);
 
-void reactionMatchVec(char **in_data, npy_bool *out_data, int size, char *querySmarts, const char *mode, int n_jobs);
+void reaction_match_vec(char **in_data, npy_bool *out_data, int size, char *querySmarts, const char *mode, int n_jobs);
 
-PyObject* reactionMatchNumPy(PyObject *np_input, char *querySmarts, char *aamMode, int n_jobs);
+PyObject* reaction_match_numpy(PyObject *np_input, char *querySmarts, char *aamMode, int n_jobs);
 
-int checkStructureSmarts(char* smarts, qword sid);
+int check_structure_smarts(char* smarts, qword sid);
 
-void structureMatchLin(char **in_data, npy_bool *out_data, int size, char *querySmarts, char *mode);
+void structure_match_lin(char **in_data, npy_bool *out_data, int size, char *querySmarts, char *mode);
 
-void structureMatchBatch(Batch* batch, int query, char* mode);
+void structure_match_batch(Batch* batch, int query, char* mode);
 
-void structureMatchVec(char **in_data, npy_bool *out_data, int size, char *querySmarts, char *mode, int n_jobs);
+void structure_match_vec(char **in_data, npy_bool *out_data, int size, char *querySmarts, char *mode, int n_jobs);
 
-PyObject* structureMatchNumpy(PyObject *np_input, char* querySmarts, char *mode, int n_jobs);
+PyObject* structure_match_numpy(PyObject *np_input, char* querySmarts, char *mode, int n_jobs);

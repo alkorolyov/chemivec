@@ -59,7 +59,7 @@ void test_reaction_batch() {
     int query = indigoLoadReactionSmartsFromString(querySmarts);
     indigoOptimize(query, NULL);
 
-    reactionMatchBatch(&batch, query, "DAYLIGHT-AAM");
+    reaction_match_batch(&batch, query, "DAYLIGHT-AAM");
     indigoFree(query);
 
     TEST_ASSERT_EQUAL(output[0], 1);
@@ -74,7 +74,7 @@ void test_reaction_lin() {
     int size = 2;
 
     char* querySmarts = "[C:1]=O>>[C:1]O";
-    reactionMatchLin(input, output, size, querySmarts, "DAYLIGHT-AAM");
+    reaction_match_lin(input, output, size, querySmarts, "DAYLIGHT-AAM");
     TEST_ASSERT_EQUAL(output[0], 1);
     TEST_ASSERT_EQUAL(output[1], 0);
 }
@@ -88,7 +88,7 @@ void test_reaction_vec() {
 
     char* querySmarts = "[C:1]=O>>[C:1]O";
     int max_cores = omp_get_max_threads();
-    reactionMatchVec(input, output, size, querySmarts, "DAYLIGHT-AAM", max_cores);
+    reaction_match_vec(input, output, size, querySmarts, "DAYLIGHT-AAM", max_cores);
     TEST_ASSERT_EQUAL(output[0], 1);
     TEST_ASSERT_EQUAL(output[1], 0);
 }
@@ -112,7 +112,7 @@ void test_incorrect_smi_batch() {
     int query = indigoLoadReactionSmartsFromString(querySmarts);
     indigoOptimize(query, NULL);
 
-    reactionMatchBatch(&batch, query, "DAYLIGHT-AAM");
+    reaction_match_batch(&batch, query, "DAYLIGHT-AAM");
     indigoFree(query);
     TEST_ASSERT_EQUAL(output[0], 0);
 
@@ -125,15 +125,15 @@ void test_incorrect_smi_vec() {
 
     char* querySmarts = "CO>>";
     int max_cores = omp_get_max_threads();
-    reactionMatchVec(input, output, size, querySmarts, "DAYLIGHT-AAM", max_cores);
+    reaction_match_vec(input, output, size, querySmarts, "DAYLIGHT-AAM", max_cores);
     TEST_ASSERT_EQUAL(output[0], 0);
 }
 
 void test_reaction_smarts() {
     indigoSetSessionId(sid);
-    TEST_ASSERT_EQUAL(checkReactionSmarts("CO>", sid), -1);
-    TEST_ASSERT_EQUAL(checkReactionSmarts("CO>>", sid), 0);
-    TEST_ASSERT_EQUAL(checkReactionSmarts("[CH3]>>", sid), 0);
+    TEST_ASSERT_EQUAL(check_reaction_smarts("CO>", sid), -1);
+    TEST_ASSERT_EQUAL(check_reaction_smarts("CO>>", sid), 0);
+    TEST_ASSERT_EQUAL(check_reaction_smarts("[CH3]>>", sid), 0);
 }
 
 
@@ -154,7 +154,7 @@ void test_substructure_batch() {
     int query = indigoLoadSmartsFromString(querySmarts);
     indigoOptimize(query, NULL);
 
-    structureMatchBatch(&batch, query, NULL);
+    structure_match_batch(&batch, query, NULL);
     indigoFree(query);
     TEST_ASSERT_EQUAL(output[0], 1);
     TEST_ASSERT_EQUAL(output[1], 0);
@@ -166,7 +166,7 @@ void test_substructure_lin() {
     int size = 2;
 
     char* querySmarts = "CC";
-    structureMatchLin(input, output, size, querySmarts, NULL);
+    structure_match_lin(input, output, size, querySmarts, NULL);
     TEST_ASSERT_EQUAL(output[0], 1);
     TEST_ASSERT_EQUAL(output[1], 0);
 }
@@ -178,7 +178,7 @@ void test_substructure_vec() {
 
     char* querySmarts = "CC";
     int max_cores = omp_get_max_threads();
-    structureMatchVec(input, output, size, querySmarts, NULL, max_cores);
+    structure_match_vec(input, output, size, querySmarts, NULL, max_cores);
     TEST_ASSERT_EQUAL(output[0], 1);
     TEST_ASSERT_EQUAL(output[1], 0);
 }

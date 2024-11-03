@@ -6,7 +6,7 @@ readme = "Readme.md"
 requires-python = ">=3.8"
 dependencies = [
     'numpy>=1.7',
-    'pandas'
+    'pandas',
 ]
 
 [project.urls]
@@ -16,6 +16,8 @@ dependencies = [
 requires = [
     "scikit-build-core",
     "numpy>=1.7",
+    'pandas',
+    'pytest',
 ]
 build-backend = "scikit_build_core.build"
 

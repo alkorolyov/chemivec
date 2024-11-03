@@ -1,0 +1,7 @@
+name: chemivec
+dependencies:
+  - python=3.10
+  - numpy=1.26
+  - pandas=2.2
+  - scikit-build-core
+  - pytest

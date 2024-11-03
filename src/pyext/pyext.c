@@ -281,7 +281,7 @@ PyObject* _rxn_subsearch(PyObject* self, PyObject* args, PyObject* kwargs) {
         return NULL;
     }
 
-    return (PyObject*) reactionMatchNumPy(np_input, querySmarts, mode, n_jobs);
+    return (PyObject*) reaction_match_numpy(np_input, querySmarts, mode, n_jobs);
 }
 
 PyObject* _mol_subsearch(PyObject* self, PyObject* args, PyObject* kwargs) {
@@ -297,7 +297,7 @@ PyObject* _mol_subsearch(PyObject* self, PyObject* args, PyObject* kwargs) {
         return NULL;
     }
 
-    return (PyObject*) structureMatchNumpy(np_input, querySmarts, mode, n_jobs);
+    return (PyObject*) structure_match_numpy(np_input, querySmarts, mode, n_jobs);
 }
 
 
